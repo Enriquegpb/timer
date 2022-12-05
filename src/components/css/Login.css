@@ -1,0 +1,20 @@
+form {
+    width: 80vw;
+    text-align: center;
+    margin: 10px auto;
+}
+
+.buttonform {
+    margin-top: 15px;
+    padding: 10px 15px;
+    border: 0;
+    border-radius: 25px;
+    box-shadow: 0 4px 0 1px rgb(192, 192, 192);
+    background-color: var(--bkg_button_form);
+    color: white;
+}
+
+.buttonform:hover, .buttonform:active {
+    box-shadow: none;
+    transform: translateY(4px);
+}

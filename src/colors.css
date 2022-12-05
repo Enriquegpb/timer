@@ -1,0 +1,50 @@
+:root {
+    /* =============================== ESPECIFIC COLORS =============================== */
+
+    --bkg_circle_timer               : #3ECEFA;           /* rgb(62, 206, 250)  */
+    --clr_circle_timer               : #FFFFFF;           /* rgb(255, 255, 255) */
+    --shw_circle_timer_after         : var(--blue_primary); /* rgb(62, 206, 250)  */
+    --shw_circle_timer_after_active  : var(--blue_light);   /* rgb(62, 206, 250)  */
+    --bkg_button_sala                : #FFFFFF;           /* rgb(255, 255, 255) */
+    --clr_button_sala                : var(--blue_primary); /* rgb(62, 107, 222)  */
+    --bkg_footer_timer               : var(--light_gray);   /* rgb(240, 240, 240) */
+    --bdr_footer_timer               : var(--blue_primary); /* rgb(62, 107, 222) */
+
+    --bkg_popup_salas  : #FFFFFF;           /* rgb(255, 255, 255) */
+    --clr_popup_salas  : #FFFFFF;           /* rgb(255, 255, 255) */
+
+    --bkg_popup_menu            : var(--light_gray);   /* rgb(240, 240, 240) */
+    --bdr_popup_menu            : var(--blue_primary); /* rgb(62, 107, 222)  */
+    --bkg_popup_menu_item       : var(--light_gray);   /* rgb(240, 240, 240) */
+    --bkg_popup_menu_item_hover : var(--strong_gray);  /* rgb(120, 120, 120) */
+    --clr_popup_menu_item       : var(--strong_gray);  /* rgb(120, 120, 120) */
+    --bdr_popup_menu_item       : var(--strong_gray);  /* rgb(120, 120, 120) */
+    
+    --bkg_menu_circle       : var(--dark_gray);    /* rbg(170, 170, 170) */
+    --bkg_menu_circle_hover : var(--strong_gray);  /* rgb(120, 120, 120) */
+    --bkg_menu_tag          : var(--middle_gray);  /* rgb(200, 200, 200) */
+
+    --bkg_button_form : var(--blue_primary); /* rgb(62, 107, 222) */
+
+    /* =============================== ESPECIFIC COLORS =============================== */
+
+    /* ================================ GENERAL COLORS ================================ */
+    --bkg_dark_block : rgba(0, 0, 0, 0.8);
+    --btn_bottom_shw : rgb(192, 192, 192);
+
+    --light_gray  : rgb(240, 240, 240);
+    --middle_gray : rgb(200, 200, 200);
+    --dark_gray   : rgb(170, 170, 170);
+    --strong_gray : rgb(120, 120, 120);
+
+    --s01 : #1A2E5E;
+    --s02 : #2C4D9E;
+    --s03 : #3E6BDE;
+    --s04 : #7ea3ff;
+    --s05 : #b9cdff;
+
+    --blue_primary : #3E6BDE;
+    --blue_light   : #3ECEFA;
+    /* ================================ GENERAL COLORS ================================ */
+}
+

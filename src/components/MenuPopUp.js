@@ -25,6 +25,7 @@ export class MenuPopUp extends Component {
                     <a href='/categorias'>Categorías</a>        {/* CRUD de las categorías */}
                     <a href='/temporizadores'>Temporizadores</a>        {/* CRUD de los temporizadores */}
                     <a href='/login'>Login</a>        {/* Login para obenter permisos CUD del CRUD */}
+                    <a href='/webnotifications'>NotificacionesWebComponent</a> 
                 </div>
             </div>
         )

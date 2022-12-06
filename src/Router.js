@@ -8,7 +8,7 @@ import Empresas from './components/Empresas';
 import Categorias from './components/Categorias';
 import Temporizadores from './components/Temporizadores';
 import Login from './components/Login';
-
+import NotificacionesWebComponent from './components/NotificacionesWebComponent';
 export default class Router extends Component {
     render() {
         return (
@@ -21,6 +21,7 @@ export default class Router extends Component {
                     <Route path="/categorias" element={<Categorias />}/>
                     <Route path="/temporizadores" element={<Temporizadores />}/>
                     <Route path="/login" element={<Login />}/>
+                    <Route path="/webnotifications" element={<NotificacionesWebComponent />}/>
                 </Routes>
             </BrowserRouter>
         )

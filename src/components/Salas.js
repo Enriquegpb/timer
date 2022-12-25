@@ -101,6 +101,7 @@ export class Salas extends Component {
     render() {
       return (
             <div>
+                <h1 className='timer_title'>SALAS</h1>
                 <div className='content_box'>
                     {
                         this.state.salas.map((sala, index) => {

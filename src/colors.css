@@ -28,6 +28,10 @@
 
     --bdr_box_sala : var(--light_gray);
 
+    --bdr_box_categoria : var(--light_gray);
+
+    --bdr_box_empresa : var(--light_gray);
+
     /* =============================== ESPECIFIC COLORS =============================== */
 
     /* ================================ GENERAL COLORS ================================ */

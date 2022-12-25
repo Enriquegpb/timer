@@ -3,8 +3,6 @@ import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Login.css';
 
-import Menu from './Menu';
-
 export class Login extends Component {
 
     userbox = React.createRef();
@@ -38,9 +36,6 @@ export class Login extends Component {
     render() {
         return (
             <div>
-                <div className='noselect' style={{"marginTop":"10px"}}>
-                    <Menu />
-                </div>
                 {
                     this.state.token === null && (
                         <form onSubmit={this.setLogin}>

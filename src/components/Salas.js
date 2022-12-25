@@ -3,13 +3,12 @@ import './css/Salas.css';
 
 import Swal from 'sweetalert2';
 
-import Menu from './Menu';
 import plusicon from '../assets/plus.svg';
 
 export class Salas extends Component {
 
     state = {
-        salas : ["pepe","juan"]
+        salas : []
     }
 
     generateRoom = () => {
@@ -83,9 +82,6 @@ export class Salas extends Component {
     render() {
       return (
             <div>
-                <div className='noselect' style={{"marginTop":"10px"}}>
-                    <Menu />
-                </div>
                 <div className='content_box'>
                     {
                         this.state.salas.map((sala, index) => {

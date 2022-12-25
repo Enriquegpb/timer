@@ -19,13 +19,13 @@ export class MenuPopUp extends Component {
                     <img src={closeicon} alt="Icono de cierre"/>
                 </button>
                 <div className='menupopup-box-items'> {/* Zona de redirección */}
-                    <NavLink to='/'>Timer</NavLink>             {/* Pantalla principal */}
-                    <NavLink to='/horario'>Horario</NavLink>    {/* CRUD del horario general del evento */}
-                    <NavLink to='/salas'>Salas</NavLink>        {/* CRUD de las salas */}
-                    <NavLink to='/empresas'>Empresas</NavLink>  {/* CRUD de las empresas */}
-                    <NavLink to='/categorias'>Categorías</NavLink>        {/* CRUD de las categorías */}
-                    <NavLink to='/temporizadores'>Temporizadores</NavLink>        {/* CRUD de los temporizadores */}
-                    <NavLink to='/login'>Login</NavLink>        {/* Login para obenter permisos CUD del CRUD */}
+                    <NavLink to='/' onClick={this.exit}>Timer</NavLink>             {/* Pantalla principal */}
+                    <NavLink to='/horario' onClick={this.exit}>Horario</NavLink>    {/* CRUD del horario general del evento */}
+                    <NavLink to='/salas' onClick={this.exit}>Salas</NavLink>        {/* CRUD de las salas */}
+                    <NavLink to='/empresas' onClick={this.exit}>Empresas</NavLink>  {/* CRUD de las empresas */}
+                    <NavLink to='/categorias' onClick={this.exit}>Categorías</NavLink>        {/* CRUD de las categorías */}
+                    <NavLink to='/temporizadores' onClick={this.exit}>Temporizadores</NavLink>        {/* CRUD de los temporizadores */}
+                    <NavLink to='/login' onClick={this.exit}>Login</NavLink>        {/* Login para obenter permisos CUD del CRUD */}
                 </div>
             </div>
         )

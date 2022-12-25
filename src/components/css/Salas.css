@@ -17,6 +17,10 @@
     display: block;
 }
 
+.box_sala:hover, .box_sala:active {
+    cursor: pointer;
+}
+
 .box_sala_target {
     position: relative;
     top: 50%;

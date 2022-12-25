@@ -6,6 +6,7 @@ import './css/MenuPopUp.css';
     con peso innecesario de imagenes para formas o iconos.
 */
 import closeicon from '../assets/closeicon.svg';
+import { NavLink } from 'react-router-dom';
 
 export class MenuPopUp extends Component {
 
@@ -18,13 +19,13 @@ export class MenuPopUp extends Component {
                     <img src={closeicon} alt="Icono de cierre"/>
                 </button>
                 <div className='menupopup-box-items'> {/* Zona de redirección */}
-                    <a href='/'>Timer</a>             {/* Pantalla principal */}
-                    <a href='/horario'>Horario</a>    {/* CRUD del horario general del evento */}
-                    <a href='/salas'>Salas</a>        {/* CRUD de las salas */}
-                    <a href='/empresas'>Empresas</a>  {/* CRUD de las empresas */}
-                    <a href='/categorias'>Categorías</a>        {/* CRUD de las categorías */}
-                    <a href='/temporizadores'>Temporizadores</a>        {/* CRUD de los temporizadores */}
-                    <a href='/login'>Login</a>        {/* Login para obenter permisos CUD del CRUD */}
+                    <NavLink to='/' onClick={this.exit}>Timer</NavLink>             {/* Pantalla principal */}
+                    <NavLink to='/horario' onClick={this.exit}>Horario</NavLink>    {/* CRUD del horario general del evento */}
+                    <NavLink to='/salas' onClick={this.exit}>Salas</NavLink>        {/* CRUD de las salas */}
+                    <NavLink to='/empresas' onClick={this.exit}>Empresas</NavLink>  {/* CRUD de las empresas */}
+                    <NavLink to='/categorias' onClick={this.exit}>Categorías</NavLink>        {/* CRUD de las categorías */}
+                    <NavLink to='/temporizadores' onClick={this.exit}>Temporizadores</NavLink>        {/* CRUD de los temporizadores */}
+                    <NavLink to='/login' onClick={this.exit}>Login</NavLink>        {/* Login para obenter permisos CUD del CRUD */}
                 </div>
             </div>
         )

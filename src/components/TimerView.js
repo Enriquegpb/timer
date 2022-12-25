@@ -3,11 +3,7 @@ import './css/TimerView.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle';
 
-/* TEMPORAL */
-import Timer from './Timer';
-
 /* SUBCOMPONENTES */
-import Menu from './Menu';
 import SalaPopUp from './SalaPopUp';
 
 export class TimerView extends Component {
@@ -38,15 +34,6 @@ export class TimerView extends Component {
                     )
                 }
                 <header>
-                <div className='noselect' style={{"marginTop":"10px"}}>
-                    {/* 
-                        Nota: (Gio) De momento estoy obteniendo resultados que no me gustan cuando inserto el menu
-                                    fuera de los componentes, en index.js. De momento se quedarán por separado en
-                                    cada componente. Una vez esté la App completada pasaré a intentar optimizar 
-                                    este tipo de resultados.
-                    */}
-                    <Menu />
-                </div>
                     <button className='mainsala noselect' onClick={ () => this.changeStatusSalaPopUp() }>
                         {this.state.room_name}
                     </button>
@@ -75,7 +62,7 @@ export class TimerView extends Component {
                             Resumen: NECESITO UN DIV CON EL VALOR DE TIEMPO (mm:ss) 
                             Ejemplo: <div>15:27</div>
                         */}
-                        <Timer />
+                        15:27
                     </span>
                 </div>
                 <footer className='noselect'>

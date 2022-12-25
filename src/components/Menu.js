@@ -10,9 +10,6 @@ import menuicon from '../assets/menuicon.svg';
 /* SUBCOMPONENTES */
 import MenuPopUp from './MenuPopUp';
 
-/* TEMPORAL */
-import Timer2 from './Timer_2';
-
 export class Menu extends Component {
 
     showHiddenMenu = () => {
@@ -36,7 +33,7 @@ export class Menu extends Component {
                         A tener en cuentra: Si aún no se ha configurado el horario (por ende no hay hora 
                         fin del evento) deberíamos deshabilitar esa información.
                     */}
-                    <b className='menutag'>Tiempo restante... <span><Timer2 /></span></b>
+                    <b className='menutag'>Tiempo restante... <span>09:21:10</span></b>
                 </div>
             </div>
         )

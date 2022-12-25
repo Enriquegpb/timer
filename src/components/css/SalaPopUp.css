@@ -3,8 +3,8 @@
     width: 100vw;
     height: 100vh;
     z-index: 10;
+    top: 0;
     background-color: var(--bkg_dark_block);
-    transform: translateY(-10px);
 }
 
 .box-popup {

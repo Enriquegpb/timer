@@ -3,9 +3,6 @@ import './css/TimerView.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle';
 
-/* TEMPORAL */
-import Timer from './Timer';
-
 /* SUBCOMPONENTES */
 import Menu from './Menu';
 import SalaPopUp from './SalaPopUp';
@@ -75,7 +72,7 @@ export class TimerView extends Component {
                             Resumen: NECESITO UN DIV CON EL VALOR DE TIEMPO (mm:ss) 
                             Ejemplo: <div>15:27</div>
                         */}
-                        <Timer />
+                        15:27
                     </span>
                 </div>
                 <footer className='noselect'>

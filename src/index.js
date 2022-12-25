@@ -8,14 +8,10 @@ import './colors.css';
 import reportWebVitals from './reportWebVitals';
 
 import Router from './Router';
-import Menu from './components/Menu';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <div>
-        <div className='noselect' style={{"marginTop":"10px"}}>
-            <Menu />
-        </div>
         <Router />
     </div>
 );

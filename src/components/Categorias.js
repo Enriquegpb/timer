@@ -101,6 +101,7 @@ export class Categorias extends Component {
     render() {
         return (
             <div>
+                <h1 className='timer_title'>CATEGORÍAS</h1>
                 <div className='content_box'>
                     {
                         this.state.categorias.map((categoria, index) => {

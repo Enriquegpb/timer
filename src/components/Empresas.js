@@ -101,6 +101,7 @@ export class Empresas extends Component {
     render() {
         return (
             <div>
+                <h1 className='timer_title'>EMPRESAS</h1>
                 <div className='content_box'>
                     {
                         this.state.empresas.map((empresa, index) => {

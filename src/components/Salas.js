@@ -7,6 +7,17 @@ import plusicon from '../assets/plus.svg';
 
 export class Salas extends Component {
 
+    componentDidMount = () => {
+        /*
+            #1 (GIO) TO (SERGIO) ->
+            Resumen: Prepara el componentDidMount para cargar los nombres de las
+            salas almacenadas en la BBDD.
+        */
+        this.setState({
+            salas : ["Sala 1", "Sala 2"]
+        });
+    }
+
     state = {
         salas : []
     }
@@ -35,6 +46,10 @@ export class Salas extends Component {
             }
         }).then((result) => {
             if (result.isConfirmed) {
+                /*
+                    #2 (GIO) TO (SERGIO) ->
+                    Resumen: Prepara esta zona para agregar la nueva sala en la BBDD.
+                */
                 var auxiliar = this.state.salas;
                     auxiliar.push(result.value);
                 this.setState({
@@ -70,6 +85,10 @@ export class Salas extends Component {
             }
         }).then((result) => {
             if (result.isConfirmed) {
+                /*
+                    #3 (GIO) TO (SERGIO) ->
+                    Resumen: Prepara esta zona para actualizar la sala en la BBDD.
+                */
                 var auxiliar = this.state.salas;
                     auxiliar.fill(result.value, index, index+1);
                 this.setState({

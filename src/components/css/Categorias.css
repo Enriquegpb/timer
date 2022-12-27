@@ -23,9 +23,27 @@
 
 .box_categoria_target {
     position: relative;
+    top: 35%;
+    margin: auto;
+    transform: translateY(-35%);
+    font-size: larger;
+    font-weight: 700;
+    font-family: Glegoo;
+}
+
+.box_categoria_target_time {
+    position: inherit;
+    background-color: var(--bkg_targer_time_categoria);
+    color: white;
+    margin: 0;
+    font-weight: 700;
+    line-height: 150%;
+}
+
+.box_categoria_target_plus {
+    position: relative;
     top: 50%;
     margin: auto;
-    padding: 10px;
     transform: translateY(-50%);
     font-size: larger;
     font-weight: 700;

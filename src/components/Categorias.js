@@ -97,7 +97,6 @@ export class Categorias extends Component {
                 this.setState({
                     categorias : auxiliar
                 })
-                console.log(this.state.categorias);
             }
         });
     }
@@ -152,7 +151,6 @@ export class Categorias extends Component {
                 this.setState({
                     categorias : auxiliar
                 })
-                console.log(this.state.categorias);
             }
         });
     }
@@ -166,24 +164,16 @@ export class Categorias extends Component {
                         this.state.categorias.map((categoria, index) => {
                             return (
                                 <div className='box_categoria' key={index} onClick={() => this.modifyCategory(index)}>
-                                    <p className='box_categoria_target noselect'>
+                                    <div className='box_categoria_target_time'>{categoria.duration}</div>
+                                    <div className='box_categoria_target noselect'>
                                         {categoria.name}
-                                    </p> <br/>
-                                    {
-                                        categoria.name.length > 12 && categoria.name.split().length > 1 ?
-                                        (
-                                            <p style={{"margin":"0"}}>{categoria.duration}</p>
-                                        ) :
-                                        (
-                                            <p style={{"marginTop":"10px", "marginBottom":"0"}}>{categoria.duration}</p>
-                                        )
-                                    }
+                                    </div>
                                 </div>
                             )
                         })
                     }
                     <div className='box_categoria last_item' onClick={() => this.generateCategories()}>
-                        <p className='box_categoria_target noselect'>
+                        <p className='box_categoria_target_plus noselect'>
                             <img src={plusicon} alt="Icono más" className='plusicon'/>
                         </p>
                     </div>

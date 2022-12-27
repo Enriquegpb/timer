@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Login.css';
+import { NavLink } from 'react-router-dom';
 
 export class Login extends Component {
 
@@ -12,9 +13,7 @@ export class Login extends Component {
         token : null
     }
 
-    setLogin = (e) => {
-        e.preventDefault();
-        localStorage.setItem("token", this.userbox.current.value + " " + this.passwordbox.current.value);
+    componentDidMount = () => {
         this.updateToken();
     }
 
@@ -23,8 +22,17 @@ export class Login extends Component {
             token : localStorage.getItem("token")
         });
     }
-    
-    componentDidMount = () => {
+
+    setLogin = (e) => {
+        e.preventDefault();
+        /*
+            #1 (GIO) TO (GUTI/SERGIO) ->
+            Resumen: Prepara esta zona para generar el token.
+            Pregunta: ¿Al final dónde se va a guardar el token?
+            Nota: Sustituir el setItem de abajo por el token correcto,
+                  lo que había era solo para hacer la prueba de diseño.
+        */
+        localStorage.setItem("token", this.userbox.current.value + " " + this.passwordbox.current.value);
         this.updateToken();
     }
 
@@ -51,9 +59,29 @@ export class Login extends Component {
                 }
                 {
                     this.state.token !== null && (
-                        <button className='buttonform' onClick={this.signout}>
-                            Cerrar sesión
-                        </button>
+                        <div className='content_box_superuser'>
+                            <NavLink to="/horario" className='button_superuser'>
+                                Horario
+                            </NavLink>
+                            <NavLink to="/salas" className='button_superuser'>
+                                Salas
+                            </NavLink>
+                            <NavLink to="/categorias" className='button_superuser'>
+                                Categorías
+                            </NavLink>
+                            <NavLink to="/empresas" className='button_superuser'>
+                                Empresas
+                            </NavLink>
+                        </div>
+                    )
+                }
+                {
+                    this.state.token !== null && (
+                        <div className='content_box_superuser'>
+                            <button className='buttonform' onClick={this.signout}>
+                                Cerrar sesión
+                            </button>
+                        </div>
                     )
                 }
             </div>

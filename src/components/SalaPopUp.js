@@ -35,12 +35,12 @@ export class SalaPopUp extends Component {
                                 this.nindex = (this.nindex >= 5)? 1 : this.nindex + 1;
                                 var scolor = "var(--s0" + this.nindex + ")";
                                 return (
-                                <button className='popup-btn-sala' 
-                                        style={{"backgroundColor":scolor}}
-                                        key={index}
-                                        onClick={ () => this.changeRoom(sala)}>
-                                    {sala}
-                                </button>
+                                    <button className='popup-btn-sala' 
+                                            style={{"backgroundColor":scolor}}
+                                            key={index}
+                                            onClick={ () => this.changeRoom(sala)}>
+                                        {sala}
+                                    </button>
                                 );
                             })
                         }

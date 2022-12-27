@@ -1,0 +1,15 @@
+.schedule_table {
+    border-radius: 25px;
+    border-collapse: collapse;
+    width: 90vw;
+    margin: auto;
+}
+
+tr, td {
+    border: 2px solid var(--dark_gray);
+    text-align: center;
+}
+
+.schedule_header {
+    font-size: 25px;
+}

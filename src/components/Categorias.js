@@ -97,7 +97,6 @@ export class Categorias extends Component {
                 this.setState({
                     categorias : auxiliar
                 })
-                console.log(this.state.categorias);
             }
         });
     }
@@ -152,7 +151,6 @@ export class Categorias extends Component {
                 this.setState({
                     categorias : auxiliar
                 })
-                console.log(this.state.categorias);
             }
         });
     }

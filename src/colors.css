@@ -30,6 +30,10 @@
 
     --bdr_box_categoria : var(--light_gray);
     --bkg_targer_time_categoria : var(--blue_primary);
+    
+    --bdr_box_temporizador : var(--light_gray);
+    --bkg_targer_time_temporizador_1 : var(--blue_primary);
+    --bkg_targer_time_temporizador_2 : orange;
 
     --bdr_box_empresa : var(--light_gray);
 

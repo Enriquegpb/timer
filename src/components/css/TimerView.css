@@ -95,7 +95,7 @@
 
 
 /* ==================================== TERCERA TIRADA GRANDES (EN PROCESO) ==================================== */
-@media screen and (min-width: 417px) and (orientation: portrait) and (max-height: 700px) {
+@media screen and (min-width: 417px) and (max-width: 720px) and (orientation: portrait) and (max-height: 700px) {
     .maincircle {
         min-width: 300px;
         min-height: 300px;
@@ -110,7 +110,7 @@
     }
 }
 
-@media screen and (min-width: 417px) and (orientation: portrait) and (min-height: 700px) and (max-height: 850px) {
+@media screen and (min-width: 417px) and (max-width: 720px) and (orientation: portrait) and (min-height: 700px) and (max-height: 850px) {
     .maincircle {
         min-width: 250px;
         min-height: 250px;
@@ -124,8 +124,52 @@
         line-height: 65pt;
     }
 }
+
+@media screen and (min-width: 417px) and (max-width: 720px) and (orientation: portrait) and (min-height: 850px) and (max-height: 1032px){
+    .maincircle {
+        min-width: 250px;
+        min-height: 250px;
+        width: 80vw;
+        height: 80vw;
+        top: 60%;
+        transform: translateY(-60%);
+    }
+    .valuecircle {
+        font-size: 105pt;
+        line-height: 115pt;
+    }
+}
+
+@media screen and (min-width: 417px) and (max-width: 720px) and (orientation: portrait) and (min-height: 1032px) {
+    .maincircle {
+        min-width: 250px;
+        min-height: 250px;
+        width: 80vw;
+        height: 80vw;
+        top: 60%;
+        transform: translateY(-60%);
+    }
+    .valuecircle {
+        font-size: 105pt;
+        line-height: 115pt;
+    }
+}
 /* ==================================== TERCERA TIRADA GRANDES (EN PROCESO) ==================================== */
 
+@media screen and (orientation: landscape) {
+    .maincircle {
+        min-width: 250px;
+        min-height: 250px;
+        width: 42vh;
+        height: 42vh;
+        top: 60%;
+        transform: translateY(-60%);
+    }
+    .valuecircle {
+        font-size: 65pt;
+        line-height: 75pt;
+    }
+}
 
 /* ==================== CIRCLE STYLES ==================== */
 .maincircle {

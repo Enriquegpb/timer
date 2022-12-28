@@ -155,6 +155,15 @@ export class Categorias extends Component {
         });
     }
     
+    getDuration = (duration) => {
+        var mytime = duration.split(":");
+        if (mytime[0] !== "00") {
+            return duration + " h";
+        } else {
+            return mytime[1] + " min";
+        }
+    }
+
     render() {
         return (
             <div>
@@ -164,7 +173,7 @@ export class Categorias extends Component {
                         this.state.categorias.map((categoria, index) => {
                             return (
                                 <div className='box_categoria' key={index} onClick={() => this.modifyCategory(index)}>
-                                    <div className='box_categoria_target_time'>{categoria.duration}</div>
+                                    <div className='box_categoria_target_time'>{this.getDuration(categoria.duration)}</div>
                                     <div className='box_categoria_target noselect'>
                                         {categoria.name}
                                     </div>

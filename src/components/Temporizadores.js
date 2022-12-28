@@ -71,10 +71,18 @@ export class Temporizadores extends Component {
         });
     }
 
-    getOptionsCategories = () => {
+    getOptionsCategories = (idcategoria) => {
         var auxiliar = '';
         this.state.categorias.forEach((catego) => {
-            auxiliar += '<option value="' + catego.idcategoria + '">' + 
+            auxiliar += '<option value="' + catego.idcategoria + '" ';
+
+            if (idcategoria !== -1) {
+                if (catego.idcategoria === idcategoria) {
+                    auxiliar += 'selected';
+                }
+            }
+
+            auxiliar += '>' + 
                             catego.categoria +
                         '</option>';
         })
@@ -90,7 +98,7 @@ export class Temporizadores extends Component {
                 '<p id="error_1" style="display:none; color:red;">Por favor, inserte una hora válida</p></br>' +
                 '<label for="swal-input2">Categoría</label></br>' +
                 '<select  id="swal-input2" class="swal2-input" style="margin-top:5px; width:70%;">' + 
-                this.getOptionsCategories() + 
+                this.getOptionsCategories(-1) + 
                 '</select>',
             focusConfirm: false,
             showCancelButton: true,
@@ -130,8 +138,55 @@ export class Temporizadores extends Component {
         });
     }
 
-    modifyTimer = () => {
-        
+    modifyTimer = (index) => {
+        new Swal({
+            title: 'Modificar temporizador',
+            html:
+                '<label for="swal-input1">Hora de inicio</label></br>' +
+                '<input type="time" id="swal-input1" class="swal2-input" style="margin-top:5px;" value="' + 
+                this.state.temporizadores[index].inicio + 
+                '"/></br>' +
+                '<p id="error_1" style="display:none; color:red;">Por favor, inserte una hora válida</p></br>' +
+                '<label for="swal-input2">Categoría</label></br>' +
+                '<select  id="swal-input2" class="swal2-input" style="margin-top:5px; width:70%;" value="2">' + 
+                this.getOptionsCategories(this.state.temporizadores[index].idcategoria) + 
+                '</select>',
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: '#2C4D9E',
+            cancelButtonText: "Cancelar",
+            preConfirm: () => {
+                if (document.getElementById('swal-input1').value === "") {
+                    document.getElementById('error_1').style.display = 'inline-block';
+                    return false;
+                } else {
+                    return [
+                        document.getElementById('swal-input1').value,
+                        document.getElementById('swal-input2').value
+                    ]
+                }
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                console.log(result);
+                /*
+                    #4 (GIO) TO (GUTI/SERGIO) ->
+                    Resumen: Prepara esta zona para agregar el temporizador modificado en la BBDD.
+                */
+                var newTimer = {
+                    idtimer : 1000, // Se le pasa su propio ID o da igual????
+                    inicio : result.value[0],
+                    idcategoria : result.value[1],
+                    pausa : false // No necesario
+                }
+                var auxiliar = this.state.temporizadores;
+                    auxiliar.fill(newTimer, index, index+1);
+                this.setState({
+                    temporizadores : auxiliar
+                })
+            }
+        });
     }
 
     render() {

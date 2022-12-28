@@ -143,20 +143,21 @@ export class Temporizadores extends Component {
                         this.state.temporizadores.map((tempo, index) => {
                             return (
                                 <div className='box_temporizador' key={index} onClick={() => this.modifyTimer(index)}>
-                                    <div className='box_temporizador_target_time_init'>
+                                    <div className='box_temporizador_target_time_init noselect'>
                                         <p className='target_text'>{tempo.inicio}</p>
                                     </div>
                                     <div className='box_temporizador_target noselect'>
                                         <p className='target_text'>{tempo.idcategoria}</p>
                                     </div>
-                                    <div className='box_temporizador_target_time_end'>
+                                    <div className='box_temporizador_target_time_end noselect'>
                                         <p className='target_text'>{tempo.inicio}</p>
                                     </div>
                                 </div>
                             )
                         })
                     }
-                    <div className='last_item' onClick={() => this.generateTimer()}>
+                    <div className='box_temporizador' onClick={() => this.generateTimer()}>
+                        <div></div> {/* No tocar */}
                         <img src={plusicon} alt="Icono más" className='plusicon noselect'/>
                     </div>
                 </div>

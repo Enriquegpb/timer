@@ -1,0 +1,24 @@
+.schedule_table_box {
+    width: 90vw;
+    margin: auto;
+}
+
+.schedule_table {
+    border-radius: 25px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+tr, td, th {
+    border: 2px solid var(--dark_gray);
+    text-align: center;
+}
+
+.schedule_header {
+    font-size: 25px;
+    font-family: Nexa;
+}
+
+.schedule_header > th:first-child {
+    width: 25%;
+}

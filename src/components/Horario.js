@@ -106,7 +106,7 @@ export class Horario extends Component {
                             </tr>
                         </thead>
                         <tbody>
-                            {
+                            { /* (GIO) SIGO TRABAJANDO EN ESTO.... */
                                 this.state.temporizadores && this.state.salas && (
                                     this.state.temporizadores.map((tempo, index) => {
                                         return (

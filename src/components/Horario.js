@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import './css/Horario.css';
 
+import plusicon from '../assets/plus.svg';
+
 export class Horario extends Component {
     state = {
         temporizadores : null,
         salas : null,
-        sala_actual : 0
+        sala_actual : 0,
+        edit_mode : false
     }
 
     componentDidMount = () => {
@@ -132,7 +135,7 @@ export class Horario extends Component {
        return "CATEGORÍA";
     }
 
-    checkCompany = (idtimer) => {
+    checkTimeCompanyRooms = (idtimer) => {
         /*
             #7 (GIO) TO (ALL)
             Resumen: Necesito un método que busque en la tabla 'tiempos_empresas_salas'
@@ -148,16 +151,25 @@ export class Horario extends Component {
         }
     }
 
+    changeMode = () => {
+        this.setState({
+            edit_mode : !this.state.edit_mode
+        })
+    }
+
     render() {
         return (
             <div>
                 <h1 className='timer_title noselect'>HORARIO</h1>
+                <button className='button_edit_schedule' onClick={() => this.changeMode()}>
+                    Editar empresas
+                </button>
                 <div className='schedule_table_box'>
                     <table className='schedule_table noselect'>
                         <thead>
                             <tr className='schedule_header'>
                                 <th></th>
-                                <th colSpan={2}>
+                                <th colSpan={4}>
                                     <button className='schedule_buttons_rooms' onClick={() => this.changeRoom(-1)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
                                             <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
@@ -180,26 +192,40 @@ export class Horario extends Component {
                             { /* (GIO) SIGO TRABAJANDO EN ESTO */
                                 this.state.temporizadores && this.state.salas && (
                                     this.state.temporizadores.map((tempo, index) => {
-                                        var check = this.checkCompany(tempo.idtimer);
+                                        var check = this.checkTimeCompanyRooms(tempo.idtimer);
                                         return (
                                             <tr key={index}>
                                                 <td>{tempo.inicio}<br/>{this.getEnd(tempo.idtimer)}</td>
                                                 {
-                                                    check && (
-                                                        <td className='schedule_col'>
-                                                            {this.getCompany(tempo.idtimer)}
+                                                    this.state.edit_mode ? (
+                                                        <td className='schedule_col' colSpan={2}>
+                                                            {
+                                                                check ? (
+                                                                    this.getCompany(tempo.idtimer)
+                                                                ) : (
+                                                                    <img src={plusicon} alt="Icono añadir"/>
+                                                                )
+                                                            }
                                                         </td>
+                                                    ) : (
+                                                        check && (
+                                                            <td className='schedule_col'>
+                                                                {this.getCompany(tempo.idtimer)}
+                                                            </td>
+                                                        )
                                                     )
                                                 }
                                                 {
-                                                    check ? (
-                                                        <td className='schedule_col'>
-                                                            {this.getCategory(tempo.idtimer)}
-                                                        </td>
-                                                    ) : (
-                                                        <td colSpan={2} className='schedule_col'>
-                                                            {this.getCategory(tempo.idtimer)}
-                                                        </td>    
+                                                    !this.state.edit_mode && (
+                                                        check ? (
+                                                            <td className='schedule_col'>
+                                                                {this.getCategory(tempo.idtimer)}
+                                                            </td>
+                                                        ) : (
+                                                            <td colSpan={2} className='schedule_col'>
+                                                                {this.getCategory(tempo.idtimer)}
+                                                            </td>    
+                                                        )
                                                     )
                                                 }
                                             </tr>

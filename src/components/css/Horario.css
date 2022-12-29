@@ -4,14 +4,30 @@
 }
 
 .schedule_table {
-    border-radius: 25px;
-    border-collapse: collapse;
+    border-collapse: separate;
     width: 100%;
+    overflow: hidden;
 }
 
 tr, td, th {
-    border: 2px solid var(--dark_gray);
     text-align: center;
+    border: 2px solid var(--dark_gray);
+    border-radius: 0;
+}
+
+th:first-child { 
+    border-top-left-radius: 10px; 
+}
+
+th:last-child {   
+    border-top-right-radius: 10px; 
+}
+tr:last-child td:first-child { 
+    border-bottom-left-radius: 10px; 
+}
+
+tr:last-child td:last-child { 
+    border-bottom-right-radius: 10px; 
 }
 
 .schedule_header {
@@ -20,5 +36,24 @@ tr, td, th {
 }
 
 .schedule_header > th:first-child {
-    width: 25%;
+    min-width: 10vw;
+}
+
+.schedule_buttons_rooms {
+    border: 0;
+    background-color: rgba(0,0,0,0);
+    padding: 0;
+    margin: 0 10px;
+    display: inline-flex;
+}
+
+.schedule_col {
+    max-width: 40vw;
+    overflow: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.schedule_col::-webkit-scrollbar {
+    display: none;
 }

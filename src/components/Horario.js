@@ -5,7 +5,7 @@ export class Horario extends Component {
     state = {
         temporizadores : null,
         salas : null,
-        sala_actual : -1
+        sala_actual : 0
     }
 
     componentDidMount = () => {
@@ -17,11 +17,11 @@ export class Horario extends Component {
         var auxiliar = this.state.sala_actual + index;
         
         if (auxiliar < 0) {
-            auxiliar = 0;
+            auxiliar = this.state.salas.length - 1;
         } 
         
         if (auxiliar >= this.state.salas.length) {
-            auxiliar = this.state.salas.length - 1;
+            auxiliar = 0;
         }
 
         this.setState({
@@ -115,9 +115,12 @@ export class Horario extends Component {
         /*
             #5 (GIO) TO (ALL)
             Resumen: Necesito un método que me devuelva el nombre de la empresa
-                     asociada al timer pasado por parámetros.
+                     asociada al timer pasado por parámetros. El idsala de la tabla
+                     'tiempos_empresas_salas' de la que sacamos la referencia de la 
+                     empresa, debe ser igual a la sala en la que nos encontramos, es
+                     decir; debe ser igual al state sala_actual.
         */
-       return "Empresa de pega";
+       return "EMPRESA";
     }
 
     getCategory = (idtimer) => {
@@ -126,7 +129,7 @@ export class Horario extends Component {
             Resumen: Necesito un método que me devuelva el nombre de la categoría
                      asociada al timer pasado por parámetros.
         */
-       return "Break";
+       return "CATEGORÍA";
     }
 
     checkCompany = (idtimer) => {
@@ -148,37 +151,57 @@ export class Horario extends Component {
     render() {
         return (
             <div>
-                <h1 className='timer_title'>HORARIO</h1>
+                <h1 className='timer_title noselect'>HORARIO</h1>
                 <div className='schedule_table_box'>
-                    <table className='schedule_table'>
+                    <table className='schedule_table noselect'>
                         <thead>
                             <tr className='schedule_header'>
                                 <th></th>
-                                <th>
+                                <th colSpan={2}>
+                                    <button className='schedule_buttons_rooms' onClick={() => this.changeRoom(-1)}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                                            <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5z"/>
+                                        </svg>
+                                    </button>
                                     {
                                         this.state.sala_actual >= 0 && this.state.salas && (
                                             this.state.salas[this.state.sala_actual].sala
                                         )
                                     }
+                                    <button className='schedule_buttons_rooms' onClick={() => this.changeRoom(1)}>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" className="bi bi-arrow-right-circle-fill" viewBox="0 0 16 16">
+                                            <path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0zM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
+                                        </svg>
+                                    </button>
                                 </th>
                             </tr>
                         </thead>
                         <tbody>
-                            { /* (GIO) SIGO TRABAJANDO EN ESTO.... */
+                            { /* (GIO) SIGO TRABAJANDO EN ESTO */
                                 this.state.temporizadores && this.state.salas && (
                                     this.state.temporizadores.map((tempo, index) => {
+                                        var check = this.checkCompany(tempo.idtimer);
                                         return (
                                             <tr key={index}>
                                                 <td>{tempo.inicio}<br/>{this.getEnd(tempo.idtimer)}</td>
-                                                <td>
-                                                    {
-                                                        this.checkCompany(tempo.idtimer) ? (
-                                                            this.getCompany(tempo.idtimer)
-                                                        ) : (
-                                                            this.getCategory(tempo.idtimer)
-                                                        )
-                                                    }
-                                                </td>
+                                                {
+                                                    check && (
+                                                        <td className='schedule_col'>
+                                                            {this.getCompany(tempo.idtimer)}
+                                                        </td>
+                                                    )
+                                                }
+                                                {
+                                                    check ? (
+                                                        <td className='schedule_col'>
+                                                            {this.getCategory(tempo.idtimer)}
+                                                        </td>
+                                                    ) : (
+                                                        <td colSpan={2} className='schedule_col'>
+                                                            {this.getCategory(tempo.idtimer)}
+                                                        </td>    
+                                                    )
+                                                }
                                             </tr>
                                         )
                                     })

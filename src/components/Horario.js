@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import './css/Horario.css';
 
+import Swal from 'sweetalert2';
+
 import plusicon from '../assets/plus.svg';
 import subicon from '../assets/sub.svg';
 
 export class Horario extends Component {
     state = {
         temporizadores : null,
+        empresas : null,
         salas : null,
         sala_actual : 0,
         edit_mode : false
@@ -15,6 +18,7 @@ export class Horario extends Component {
     componentDidMount = () => {
         this.loadRooms();
         this.loadTimers();
+        this.loadCompanies();
     }
 
     changeRoom = (index) => {
@@ -30,6 +34,42 @@ export class Horario extends Component {
 
         this.setState({
             sala_actual : auxiliar
+        });
+    }
+
+    loadCompanies = () => {
+        /*
+            #0 (GIO) TO (ALL)
+            Resumen: Necesito preparar este método para cargar todas las
+                     empresas creadas hasta este momento y almacenarlas
+                     en el array del state. (Después sustituir el array 
+                     de ejemplo por el correcto)
+        */
+        this.setState({
+            empresas : [
+                {
+                    idempresa : 1,
+                    empresa : "Empresa 1",
+                    imagen : ""
+                },
+                {
+                    idempresa : 2,
+                    empresa : "Empresa 2",
+                    imagen : ""
+                },
+                {
+                    idempresa : 3,
+                    empresa : "Empresa 3",
+                    imagen : ""
+                },
+                {
+                    idempresa : 4,
+                    empresa : "Empresa 4",
+                    imagen : ""
+                }
+            ]     
+        }, () => {
+            this.changeRoom(0);
         });
     }
 
@@ -155,14 +195,64 @@ export class Horario extends Component {
     changeMode = () => {
         this.setState({
             edit_mode : !this.state.edit_mode
+        }, () => {
+            document.getElementById("button_edit_schedule").innerText = (this.state.edit_mode) ? "Volver" : "Editar empresas";
         })
+    }
+
+    getOptionsCompanies = () => {
+        var auxiliar = '';
+        this.state.empresas.forEach((company) => {
+            auxiliar += '<option value="' + company.idempresa + '">' + 
+                            company.empresa +
+                        '</option>';
+        })
+        return auxiliar;
+    }
+
+    createTimer = (index) => {
+        new Swal({
+            title: 'Asignar empresa',
+            html:
+                '<label for="swal-input1">Empresa</label></br>' +
+                '<select  id="swal-input1" class="swal2-input" style="margin-top:5px; width: 70%;">' + 
+                    this.getOptionsCompanies() + 
+                '</select>',
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: "Aceptar",
+            confirmButtonColor: '#2C4D9E',
+            cancelButtonText: "Cancelar",
+            preConfirm: () => {
+                return [
+                    document.getElementById('swal-input1').value
+                ]
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                new Swal({
+                    title: '¿Datos correctos?',
+                    text: "cosas",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, guardar',
+                    cancelButtonText: 'No, cancelar'
+                }).then((subresult) => {
+                    if (subresult.isConfirmed) {
+                        Swal.fire(result.value[0])
+                    }
+                });
+            }
+        });
     }
 
     render() {
         return (
             <div>
                 <h1 className='timer_title noselect'>HORARIO</h1>
-                <button className='button_edit_schedule' onClick={() => this.changeMode()}>
+                <button id="button_edit_schedule" className='button_edit_schedule' onClick={() => this.changeMode()}>
                     Editar empresas
                 </button>
                 <div className='schedule_table_box'>
@@ -209,7 +299,7 @@ export class Horario extends Component {
                                                                         </button>
                                                                         <div className='company_edit_box_target scroll'>
                                                                             <p className="target_text">
-                                                                                {this.getCompany(tempo.idtimer)}eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+                                                                                {this.getCompany(tempo.idtimer)}
                                                                             </p>
                                                                         </div>
                                                                         <div className='inactive'>
@@ -226,7 +316,7 @@ export class Horario extends Component {
                                                                                 -
                                                                             </p>
                                                                         </div>
-                                                                        <button className='company_edit_box_target_add'>
+                                                                        <button className='company_edit_box_target_add' onClick={() => this.createTimer(index)}>
                                                                             <img src={plusicon} className="addsub_icon" alt="Icono añadir"/>
                                                                         </button>
                                                                     </div>

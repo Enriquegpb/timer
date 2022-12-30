@@ -50,13 +50,6 @@ tr:last-child td:last-child {
 
 .schedule_col {
     max-width: 10em;
-    overflow: scroll;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
-
-.schedule_col::-webkit-scrollbar {
-    display: none;
 }
 
 .schedule_col > img {
@@ -79,4 +72,73 @@ tr:last-child td:last-child {
     box-shadow: none;
     color: white;
     transform: translateY(4px);
+}
+
+.company_edit_box {
+    margin: 0;
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 0.5fr 2fr 0.5fr;
+    align-items: stretch;
+}
+
+.company_edit_box_target {
+    font-size: larger;
+    font-weight: 700;
+    font-family: Glegoo;
+    max-width: 2fr;
+    overflow: scroll;
+}
+
+.company_edit_box_target_add {
+    filter: var(--fill_targer_company_add);
+}
+
+.company_edit_box_target_add:active {
+    filter: var(--fill_targer_company_add_active);
+}
+
+.company_edit_box_target_sub {
+    filter: var(--fill_targer_company_sub);
+}
+
+.company_edit_box_target_sub:active {
+    filter: var(--fill_targer_company_sub_active);
+}
+
+.company_edit_box_target_add, .company_edit_box_target_sub {
+    border: 0;
+    background-color: transparent;
+    padding: 0;
+}
+
+.inactive {
+    filter: var(--fill_targer_company_inactive);
+}
+
+.target_text {
+    margin: 0;
+    top: 50%;
+    position: relative;
+    transform: translateY(-50%);
+}
+
+.addsub_icon {
+    width: 80%;
+    top: 50%;
+    margin: 0;
+    transform: translateY(-50%);
+    position: relative;
+}
+
+.scroll {
+    overflow: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.scroll::-webkit-scrollbar {
+    display: none;
 }

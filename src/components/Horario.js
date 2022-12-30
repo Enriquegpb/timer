@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './css/Horario.css';
 
 import plusicon from '../assets/plus.svg';
+import subicon from '../assets/sub.svg';
 
 export class Horario extends Component {
     state = {
@@ -189,27 +190,52 @@ export class Horario extends Component {
                             </tr>
                         </thead>
                         <tbody>
-                            { /* (GIO) SIGO TRABAJANDO EN ESTO */
+                            {
                                 this.state.temporizadores && this.state.salas && (
                                     this.state.temporizadores.map((tempo, index) => {
                                         var check = this.checkTimeCompanyRooms(tempo.idtimer);
+                                        var catcolspan = check ? 1 : 2;
                                         return (
                                             <tr key={index}>
                                                 <td>{tempo.inicio}<br/>{this.getEnd(tempo.idtimer)}</td>
                                                 {
                                                     this.state.edit_mode ? (
-                                                        <td className='schedule_col' colSpan={2}>
+                                                        <td className='schedule_col scroll' colSpan={2}>
                                                             {
                                                                 check ? (
-                                                                    this.getCompany(tempo.idtimer)
+                                                                    <div className='company_edit_box'>
+                                                                        <button className='company_edit_box_target_sub'>
+                                                                            <img src={subicon} className="addsub_icon" alt="Icono restar"/>
+                                                                        </button>
+                                                                        <div className='company_edit_box_target scroll'>
+                                                                            <p className="target_text">
+                                                                                {this.getCompany(tempo.idtimer)}eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+                                                                            </p>
+                                                                        </div>
+                                                                        <div className='inactive'>
+                                                                            <img src={plusicon} className="addsub_icon" alt="Icono añadir"/>
+                                                                        </div>
+                                                                    </div>
                                                                 ) : (
-                                                                    <img src={plusicon} alt="Icono añadir"/>
+                                                                    <div className='company_edit_box'>
+                                                                        <div className='inactive'>
+                                                                            <img src={subicon} className="addsub_icon" alt="Icono restar"/>
+                                                                        </div>
+                                                                        <div className='company_edit_box_target scroll'>
+                                                                            <p className="target_text">
+                                                                                -
+                                                                            </p>
+                                                                        </div>
+                                                                        <button className='company_edit_box_target_add'>
+                                                                            <img src={plusicon} className="addsub_icon" alt="Icono añadir"/>
+                                                                        </button>
+                                                                    </div>
                                                                 )
                                                             }
                                                         </td>
                                                     ) : (
                                                         check && (
-                                                            <td className='schedule_col'>
+                                                            <td className='schedule_col scroll'>
                                                                 {this.getCompany(tempo.idtimer)}
                                                             </td>
                                                         )
@@ -217,15 +243,9 @@ export class Horario extends Component {
                                                 }
                                                 {
                                                     !this.state.edit_mode && (
-                                                        check ? (
-                                                            <td className='schedule_col'>
-                                                                {this.getCategory(tempo.idtimer)}
-                                                            </td>
-                                                        ) : (
-                                                            <td colSpan={2} className='schedule_col'>
-                                                                {this.getCategory(tempo.idtimer)}
-                                                            </td>    
-                                                        )
+                                                        <td colSpan={catcolspan} className='schedule_col scroll'>
+                                                            {this.getCategory(tempo.idtimer)}
+                                                        </td>    
                                                     )
                                                 }
                                             </tr>

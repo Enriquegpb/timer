@@ -10,6 +10,7 @@ export class Horario extends Component {
     state = {
         temporizadores : null,
         empresas : null,
+        tiempos_empresas_salas : null,
         salas : null,
         sala_actual : 0,
         edit_mode : false
@@ -19,6 +20,7 @@ export class Horario extends Component {
         this.loadRooms();
         this.loadTimers();
         this.loadCompanies();
+        this.loadTiemposEmpresasSalas();
     }
 
     changeRoom = (index) => {
@@ -37,9 +39,22 @@ export class Horario extends Component {
         });
     }
 
+    loadTiemposEmpresasSalas = () => {
+        this.setState({
+            tiempos_empresas_salas : [
+                {
+                    idtimer : 1,
+                    idempresa : 1,
+                    idsala : 1,
+                    idevento : 0
+                },
+            ]
+        });
+    }
+
     loadCompanies = () => {
         /*
-            #0 (GIO) TO (ALL)
+            #1 (GIO) TO (ALL)
             Resumen: Necesito preparar este método para cargar todas las
                      empresas creadas hasta este momento y almacenarlas
                      en el array del state. (Después sustituir el array 
@@ -68,14 +83,12 @@ export class Horario extends Component {
                     imagen : ""
                 }
             ]     
-        }, () => {
-            this.changeRoom(0);
         });
     }
 
     loadRooms = () => {
         /*
-            #1 (GIO) TO (ALL)
+            #2 (GIO) TO (ALL)
             Resumen: Necesito preparar este método para cargar todas las
                      salas creadas hasta este momento y almacenarlas
                      en el array del state. (Después sustituir el array 
@@ -107,7 +120,7 @@ export class Horario extends Component {
 
     loadTimers = () => {
         /*
-            #2 (GIO) TO (ALL)
+            #3 (GIO) TO (ALL)
             Resumen: Necesito preparar este método para cargar todos los
                      temporizadores creados hasta este momento y almacenarlos
                      en el array del state. (Después eliminar el ejemplo de abajo)
@@ -137,7 +150,7 @@ export class Horario extends Component {
     }
 
     /*
-        #3 (GIO) TO (ALL)
+        #4 (GIO) TO (ALL)
         Resumen: ¿No se mantiene el orden al cargar los temporizadores verdad? 
                     Sería más cómodo tener el array ordenado por de más temprano
                     a más tarde, a través de su 'inicio'. Si es posible, crear otro método
@@ -146,7 +159,7 @@ export class Horario extends Component {
 
     getEnd = (idtimer) => {
         /*
-            #4 (GIO) TO (ALL)
+            #5 (GIO) TO (ALL)
             Resumen: Necesito un método que calcule la hora de finalización
                         del timer. Se podría pasar el texto a objeto Time (milisegundos)
                         añadir la duración (también en milisegundos) y posteriormente
@@ -157,7 +170,7 @@ export class Horario extends Component {
     
     getCompany = (idtimer) => {
         /*
-            #5 (GIO) TO (ALL)
+            #6 (GIO) TO (ALL)
             Resumen: Necesito un método que me devuelva el nombre de la empresa
                      asociada al timer pasado por parámetros. El idsala de la tabla
                      'tiempos_empresas_salas' de la que sacamos la referencia de la 
@@ -169,7 +182,7 @@ export class Horario extends Component {
 
     getCategory = (idtimer) => {
         /*
-            #6 (GIO) TO (ALL)
+            #7 (GIO) TO (ALL)
             Resumen: Necesito un método que me devuelva el nombre de la categoría
                      asociada al timer pasado por parámetros.
         */
@@ -178,18 +191,20 @@ export class Horario extends Component {
 
     checkTimeCompanyRooms = (idtimer) => {
         /*
-            #7 (GIO) TO (ALL)
+            #8 (GIO) TO (ALL)
             Resumen: Necesito un método que busque en la tabla 'tiempos_empresas_salas'
                      un registro cuyo idtimer sea igual al pasado por parámetros y cuyo
-                     idsala sea igual al que hay en la variable this.state.sala_actual.
-                     En caso de que dicho registro exista, se devolverá true de lo contrario
+                     idsala sea igual al que hay en la variable this.state.salas[this.state.sala_actual].idsala.
+                     En caso de que dicho registro exista, se devolverá true, de lo contrario
                      se devolverá false. (Después eliminar el código de abajo, que lo utilizo de prueba)
         */
-        if (idtimer === 1) {
-            return true;
-        } else {
-            return false;
-        }
+        var existe = false;
+        this.state.tiempos_empresas_salas.forEach(element => {
+            if (element.idtimer === idtimer && element.idsala === this.state.salas[this.state.sala_actual].idsala) {
+                existe = true;
+            }
+        });
+        return existe;
     }
 
     changeMode = () => {
@@ -230,9 +245,15 @@ export class Horario extends Component {
             }
         }).then((result) => {
             if (result.isConfirmed) {
+                var newRegister = {
+                    idtimer : this.state.temporizadores[index].idtimer,
+                    idempresa : Number.parseInt(result.value[0]),
+                    idsala : this.state.salas[this.state.sala_actual].idsala,
+                    idevento : 0
+                }
                 new Swal({
                     title: '¿Datos correctos?',
-                    text: "cosas",
+                    text: JSON.stringify(newRegister),
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
@@ -241,7 +262,12 @@ export class Horario extends Component {
                     cancelButtonText: 'No, cancelar'
                 }).then((subresult) => {
                     if (subresult.isConfirmed) {
-                        Swal.fire(result.value[0])
+                        Swal.fire(JSON.stringify(newRegister));
+                        // this.setState({
+                        //     tiempos_empresas_salas : [
+                        //         
+                        //     ]
+                        // });
                     }
                 });
             }

@@ -190,6 +190,21 @@ export class Temporizadores extends Component {
         });
     }
 
+    getNameCategory = (idcategoria) => {
+        /*
+            #5 (GIO) TO (GUTI/SERGIO) ->
+            Resumen: Prepara este método para recuperar el nombre de la categoría cuyo id se
+            pasa por parámetros.
+        */
+        var res = "";
+        this.state.categorias.forEach(element => {
+            if (element.idcategoria === idcategoria) {
+                res = element.categoria;
+            }
+        });
+        return res;
+    }
+
     render() {
         return (
             <div>
@@ -203,7 +218,7 @@ export class Temporizadores extends Component {
                                         <p className='target_text'>{tempo.inicio}</p>
                                     </div>
                                     <div className='box_temporizador_target noselect'>
-                                        <p className='target_text'>{tempo.idcategoria}</p>
+                                        <p className='target_text'>{this.getNameCategory(tempo.idcategoria)}</p>
                                     </div>
                                     <div className='box_temporizador_target_time_end noselect'>
                                         <p className='target_text'>{tempo.inicio}</p>

@@ -29,6 +29,7 @@ export class Salas extends Component {
             inputLabel: 'Inserte un nuevo nombre para la sala',
             showCancelButton: true,
             confirmButtonText: "Aceptar",
+            confirmButtonColor: "#2C4D9E",
             cancelButtonText: "Cancelar",
             inputValidator: (value) => {
                 if (!value) {
@@ -64,10 +65,14 @@ export class Salas extends Component {
         Swal.fire({
             title: 'Modificar sala',
             input: 'text',
-            inputLabel: 'Inserte un nuevo nombre para la sala',
+            inputLabel: 'Nombre',
             inputValue: this.state.salas[index],
+            showDenyButton: true,
             showCancelButton: true,
-            confirmButtonText: "Aceptar",
+            confirmButtonText: "Guardar sala",
+            confirmButtonColor: "#2C4D9E",
+            denyButtonText: "Eliminar sala",
+            denyButtonColor: "#FF0000",
             cancelButtonText: "Cancelar",
             inputValidator: (value) => {
                 if (!value) {
@@ -84,16 +89,22 @@ export class Salas extends Component {
                 }
             }
         }).then((result) => {
+            var auxiliar = this.state.salas;
             if (result.isConfirmed) {
                 /*
                     #3 (GIO) TO (SERGIO) ->
                     Resumen: Prepara esta zona para actualizar la sala en la BBDD.
                 */
-                var auxiliar = this.state.salas;
                     auxiliar.fill(result.value, index, index+1);
                 this.setState({
                     salas : auxiliar
-                })
+                });
+            }
+            if (result.isDenied) {
+                    auxiliar.splice(index, 1);
+                this.setState({
+                    salas : auxiliar
+                });
             }
         });
     }

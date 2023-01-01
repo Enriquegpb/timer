@@ -6,20 +6,32 @@ import Swal from 'sweetalert2';
 import plusicon from '../assets/plus.svg';
 
 export class Salas extends Component {
+    state = {
+        salas : []
+    }
 
     componentDidMount = () => {
+        this.loadRooms();
+    }
+
+    loadRooms = () => {
         /*
             #1 (GIO) TO (SERGIO) ->
-            Resumen: Prepara el componentDidMount para cargar los nombres de las
+            Resumen: Prepara el método para cargar las
             salas almacenadas en la BBDD.
         */
         this.setState({
-            salas : ["Sala 1", "Sala 2"]
+            salas : [
+                {
+                    idsala : 1,
+                    sala : "Sala 1"
+                },
+                {
+                    idsala : 2,
+                    sala : "Sala 2"
+                },
+            ]
         });
-    }
-
-    state = {
-        salas : []
     }
 
     generateRoom = () => {
@@ -38,7 +50,7 @@ export class Salas extends Component {
                     var auxiliar = this.state.salas;
                     var correcto = true;
                     auxiliar.forEach(element => {
-                        if (value.toUpperCase() === element.toUpperCase()) {
+                        if (value.toUpperCase() === element.sala.toUpperCase()) {
                             correcto = false;       
                         }
                     });
@@ -51,12 +63,16 @@ export class Salas extends Component {
                     #2 (GIO) TO (SERGIO) ->
                     Resumen: Prepara esta zona para agregar la nueva sala en la BBDD.
                 */
+                var newRoom = {
+                    idsala : this.state.salas,
+                    sala : result.value
+                }
+
                 var auxiliar = this.state.salas;
-                    auxiliar.push(result.value);
+                    auxiliar.push(newRoom);
                 this.setState({
                     salas : auxiliar
-                })
-                console.log(this.state.salas);
+                });
             }
         });
     }
@@ -66,7 +82,7 @@ export class Salas extends Component {
             title: 'Modificar sala',
             input: 'text',
             inputLabel: 'Nombre',
-            inputValue: this.state.salas[index],
+            inputValue: this.state.salas[index].sala,
             showDenyButton: true,
             showCancelButton: true,
             confirmButtonText: "Guardar sala",
@@ -81,7 +97,7 @@ export class Salas extends Component {
                     var auxiliar = this.state.salas;
                     var correcto = true;
                     auxiliar.forEach(element => {
-                        if (value.toUpperCase() === element.toUpperCase()) {
+                        if (value.toUpperCase() === element.sala.toUpperCase()) {
                             correcto = false;       
                         }
                     });
@@ -95,7 +111,12 @@ export class Salas extends Component {
                     #3 (GIO) TO (SERGIO) ->
                     Resumen: Prepara esta zona para actualizar la sala en la BBDD.
                 */
-                    auxiliar.fill(result.value, index, index+1);
+                var newRoom = {
+                    idsala : this.state.salas[index].idsala,
+                    sala : result.value
+                }
+
+                auxiliar.fill(newRoom, index, index+1);
                 this.setState({
                     salas : auxiliar
                 });
@@ -119,7 +140,7 @@ export class Salas extends Component {
                             return (
                                 <div className='box_sala' key={index} onClick={() => this.modifyRoom(index)}>
                                     <p className='box_sala_target noselect'>
-                                        {sala}
+                                        {sala.sala}
                                     </p>
                                 </div>
                             )

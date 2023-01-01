@@ -78,11 +78,12 @@ export class Salas extends Component {
     }
 
     modifyRoom = (index) => {
+        var currentName = this.state.salas[index].sala;
         Swal.fire({
             title: 'Modificar sala',
             input: 'text',
             inputLabel: 'Nombre',
-            inputValue: this.state.salas[index].sala,
+            inputValue: currentName,
             showDenyButton: true,
             showCancelButton: true,
             confirmButtonText: "Guardar sala",
@@ -96,11 +97,13 @@ export class Salas extends Component {
                 } else {
                     var auxiliar = this.state.salas;
                     var correcto = true;
-                    auxiliar.forEach(element => {
-                        if (value.toUpperCase() === element.sala.toUpperCase()) {
-                            correcto = false;       
-                        }
-                    });
+                    if (currentName.toUpperCase() !== value.toUpperCase()) {
+                        auxiliar.forEach(element => {
+                            if (value.toUpperCase() === element.sala.toUpperCase()) {
+                                correcto = false;       
+                            }
+                        });                        
+                    }
                     if (!correcto) { return 'Ya existe una sala con el mismo nombre' };
                 }
             }

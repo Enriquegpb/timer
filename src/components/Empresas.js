@@ -64,10 +64,14 @@ export class Empresas extends Component {
         Swal.fire({
             title: 'Modificar empresa',
             input: 'text',
-            inputLabel: 'Inserte un nuevo nombre para la empresa',
+            inputLabel: 'Nombre',
             inputValue: this.state.empresas[index],
+            showDenyButton: true,
             showCancelButton: true,
-            confirmButtonText: "Aceptar",
+            confirmButtonText: "Guardar empresa",
+            confirmButtonColor: "#2C4D9E",
+            denyButtonText: "Eliminar empresa",
+            denyButtonColor: "#FF0000",
             cancelButtonText: "Cancelar",
             inputValidator: (value) => {
                 if (!value) {
@@ -84,16 +88,22 @@ export class Empresas extends Component {
                 }
             }
         }).then((result) => {
+            var auxiliar = this.state.empresas;
             if (result.isConfirmed) {
                 /*
                     #3 (GIO) TO (GUTI/SERGIO) ->
                     Resumen: Prepara esta zona para actualizar la empresa en la BBDD.
                 */
-                var auxiliar = this.state.empresas;
                     auxiliar.fill(result.value, index, index+1);
                 this.setState({
                     empresas : auxiliar
                 })
+            }
+            if (result.isDenied) {
+                auxiliar.splice(index, 1);
+                this.setState({
+                    empresas : auxiliar
+                });
             }
         });
     }

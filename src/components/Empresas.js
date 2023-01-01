@@ -13,7 +13,23 @@ export class Empresas extends Component {
             categorías almacenadas en la BBDD.
         */
         this.setState({
-            empresas : ["empresa 1", "empresa 2"]
+            empresas : [
+                {
+                    idempresa : 1,
+                    empresa : "Empresa 1",
+                    imagen : ""
+                },
+                {
+                    idempresa : 2,
+                    empresa : "Empresa 2",
+                    imagen : ""
+                },
+                {
+                    idempresa : 3,
+                    empresa : "Empresa 3",
+                    imagen : ""
+                },
+            ]
         });
     }
 
@@ -37,7 +53,7 @@ export class Empresas extends Component {
                     var auxiliar = this.state.empresas;
                     var correcto = true;
                     auxiliar.forEach(element => {
-                        if (value.toUpperCase() === element.toUpperCase()) {
+                        if (value.toUpperCase() === element.empresa.toUpperCase()) {
                             correcto = false;       
                         }
                     });
@@ -50,24 +66,34 @@ export class Empresas extends Component {
                     #2 (GIO) TO (GUTI/SERGIO) ->
                     Resumen: Prepara esta zona para agregar la nueva empresa en la BBDD.
                 */
+                var newCompany = {
+                    idempresa : this.state.empresas.length,
+                    empresa : result.value,
+                    imagen : ""
+                }
+
                 var auxiliar = this.state.empresas;
-                    auxiliar.push(result.value);
+                    auxiliar.push(newCompany);
                 this.setState({
                     empresas : auxiliar
-                })
-                console.log(this.state.empresas);
+                });
             }
         });
     }
 
     modifyCompany = (index) => {
+        var currentName = this.state.empresas[index].empresa;
         Swal.fire({
             title: 'Modificar empresa',
             input: 'text',
-            inputLabel: 'Inserte un nuevo nombre para la empresa',
-            inputValue: this.state.empresas[index],
+            inputLabel: 'Nombre',
+            inputValue: currentName,
+            showDenyButton: true,
             showCancelButton: true,
-            confirmButtonText: "Aceptar",
+            confirmButtonText: "Guardar empresa",
+            confirmButtonColor: "#2C4D9E",
+            denyButtonText: "Eliminar empresa",
+            denyButtonColor: "#FF0000",
             cancelButtonText: "Cancelar",
             inputValidator: (value) => {
                 if (!value) {
@@ -75,25 +101,39 @@ export class Empresas extends Component {
                 } else {
                     var auxiliar = this.state.empresas;
                     var correcto = true;
-                    auxiliar.forEach(element => {
-                        if (value.toUpperCase() === element.toUpperCase()) {
-                            correcto = false;       
-                        }
-                    });
+                    if (currentName.toUpperCase() !== value.toUpperCase()) {
+                        auxiliar.forEach(element => {
+                            if (value.toUpperCase() === element.empresa.toUpperCase()) {
+                                correcto = false;       
+                            }
+                        });                        
+                    }
                     if (!correcto) { return 'Ya existe una empresa con el mismo nombre' };
                 }
             }
         }).then((result) => {
+            var auxiliar = this.state.empresas;
             if (result.isConfirmed) {
                 /*
                     #3 (GIO) TO (GUTI/SERGIO) ->
                     Resumen: Prepara esta zona para actualizar la empresa en la BBDD.
                 */
-                var auxiliar = this.state.empresas;
-                    auxiliar.fill(result.value, index, index+1);
+                var newCompany = {
+                    idempresa : this.state.empresas[index].idempresa,
+                    empresa : result.value,
+                    imagen : ""
+                }
+
+                auxiliar.fill(newCompany, index, index+1);
                 this.setState({
                     empresas : auxiliar
                 })
+            }
+            if (result.isDenied) {
+                auxiliar.splice(index, 1);
+                this.setState({
+                    empresas : auxiliar
+                });
             }
         });
     }
@@ -108,7 +148,7 @@ export class Empresas extends Component {
                             return (
                                 <div className='box_empresa' key={index} onClick={() => this.modifyCompany(index)}>
                                     <p className='box_empresa_target noselect'>
-                                        {empresa}
+                                        {empresa.empresa}
                                     </p>
                                 </div>
                             )

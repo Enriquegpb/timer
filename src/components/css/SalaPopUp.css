@@ -23,8 +23,8 @@
 
 .box-btns {
     position: absolute;
-    width: calc(100% - 50px);
-    height: calc(100% - 50px);
+    width: calc(100% - 10vw);
+    height: calc(100% - 10vw);
     overflow: scroll;
     border-radius: 25px;
     overflow: scroll;

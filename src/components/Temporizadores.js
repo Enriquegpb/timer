@@ -29,13 +29,13 @@ export class Temporizadores extends Component {
                     pausa : false // No necesario
                 },
                 {
-                    idtimer : 1,
+                    idtimer : 2,
                     inicio : "08:45",
                     idcategoria : 2, // SUPONGAMOS QUE ES 'BREAK 5MIN'
                     pausa : false // No necesario
                 },
                 {
-                    idtimer : 1,
+                    idtimer : 3,
                     inicio : "08:50",
                     idcategoria : 3, // SUPONGAMOS QUE ES 'LONG BREAK'
                     pausa : false // No necesario
@@ -148,7 +148,7 @@ export class Temporizadores extends Component {
                 '"/></br>' +
                 '<p id="error_1" style="display:none; color:red;">Por favor, inserte una hora válida</p></br>' +
                 '<label for="swal-input2">Categoría</label></br>' +
-                '<select  id="swal-input2" class="swal2-input" style="margin-top:5px; width:70%;" value="2">' + 
+                '<select  id="swal-input2" class="swal2-input" style="margin-top:5px; width:70%;">' + 
                 this.getOptionsCategories(this.state.temporizadores[index].idcategoria) + 
                 '</select>',
             focusConfirm: false,
@@ -169,7 +169,6 @@ export class Temporizadores extends Component {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                console.log(result);
                 /*
                     #4 (GIO) TO (GUTI/SERGIO) ->
                     Resumen: Prepara esta zona para agregar el temporizador modificado en la BBDD.
@@ -177,16 +176,33 @@ export class Temporizadores extends Component {
                 var newTimer = {
                     idtimer : 1000, // Se le pasa su propio ID o da igual????
                     inicio : result.value[0],
-                    idcategoria : result.value[1],
+                    idcategoria : Number.parseInt(result.value[1]),
                     pausa : false // No necesario
                 }
                 var auxiliar = this.state.temporizadores;
                     auxiliar.fill(newTimer, index, index+1);
                 this.setState({
                     temporizadores : auxiliar
+                }, () => {
+                    // console.log(JSON.stringify(this.state.temporizadores));
                 })
             }
         });
+    }
+
+    getNameCategory = (idcategoria) => {
+        /*
+            #5 (GIO) TO (GUTI/SERGIO) ->
+            Resumen: Prepara este método para recuperar el nombre de la categoría cuyo id se
+            pasa por parámetros.
+        */
+        var res = "";
+        this.state.categorias.forEach(element => {
+            if (element.idcategoria === idcategoria) {
+                res = element.categoria;
+            }
+        });
+        return res;
     }
 
     render() {
@@ -202,7 +218,7 @@ export class Temporizadores extends Component {
                                         <p className='target_text'>{tempo.inicio}</p>
                                     </div>
                                     <div className='box_temporizador_target noselect'>
-                                        <p className='target_text'>{tempo.idcategoria}</p>
+                                        <p className='target_text'>{this.getNameCategory(tempo.idcategoria)}</p>
                                     </div>
                                     <div className='box_temporizador_target_time_end noselect'>
                                         <p className='target_text'>{tempo.inicio}</p>

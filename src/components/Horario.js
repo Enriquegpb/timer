@@ -262,13 +262,46 @@ export class Horario extends Component {
                     cancelButtonText: 'No, cancelar'
                 }).then((subresult) => {
                     if (subresult.isConfirmed) {
-                        Swal.fire(JSON.stringify(newRegister));
-                        // this.setState({
-                        //     tiempos_empresas_salas : [
-                        //         
-                        //     ]
-                        // });
+                        var auxiliar = this.state.tiempos_empresas_salas;
+                        auxiliar.push(newRegister);
+                        this.setState({
+                            tiempos_empresas_salas : auxiliar
+                        });
                     }
+                });
+            }
+        });
+    }
+
+    deleteTimer = (idtimer) => {
+        /*
+            #9 (GIO) TO (ALL)
+            Resumen: Necesito un método que elimine en la tabla 'tiempos_empresas_salas'
+                     un registro cuyo idtimer sea igual al pasado por parámetros y cuyo
+                     idsala sea igual al que hay en la variable this.state.salas[this.state.sala_actual].idsala
+        */
+        var position = -1;
+        this.state.tiempos_empresas_salas.forEach((element, index) => {
+            if (element.idtimer === idtimer && element.idsala === this.state.salas[this.state.sala_actual].idsala) {
+                position = index;
+            }    
+        });
+
+        new Swal({
+            title: 'Quitar empresa',
+            text: "Se eliminará la empresa del timer seleccionado. Solo verá la categoría, hasta añadir una nueva empresa",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí',
+            cancelButtonText: 'No'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                var auxiliar = this.state.tiempos_empresas_salas;
+                auxiliar.splice(position, 1);
+                this.setState({
+                    tiempos_empresas_salas : auxiliar
                 });
             }
         });
@@ -320,7 +353,7 @@ export class Horario extends Component {
                                                             {
                                                                 check ? (
                                                                     <div className='company_edit_box'>
-                                                                        <button className='company_edit_box_target_sub'>
+                                                                        <button className='company_edit_box_target_sub' onClick={() => this.deleteTimer(tempo.idtimer)}>
                                                                             <img src={subicon} className="addsub_icon" alt="Icono restar"/>
                                                                         </button>
                                                                         <div className='company_edit_box_target scroll'>

@@ -127,6 +127,7 @@ tr:last-child td:last-child {
 
 .addsub_icon {
     width: 80%;
+    max-width: 5vh;
     top: 50%;
     margin: 0;
     transform: translateY(-50%);

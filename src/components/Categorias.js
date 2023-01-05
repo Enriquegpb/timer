@@ -39,7 +39,7 @@ export class Categorias extends Component {
             title: 'Nueva categoría',
             html:
                 '<label for="swal-input1">Nombre</label></br>' +
-                '<input id="swal-input1" class="swal2-input" style="margin-top:5px;margin-bottom:0;"/></br>' +
+                '<input id="swal-input1" class="swal2-input" style="margin-top:5px;margin-bottom:0;max-width:70%;"/></br>' +
                 '<p id="error_1" style="display:none; color:red;">El nombre no puede estar vacío</p>' +
                 '<p id="error_2" style="display:none; color:red;">Ya existe una categoría con el mismo nombre</p></br>' +
                 '<label for="swal-input2">Duración</label></br>' +
@@ -110,7 +110,7 @@ export class Categorias extends Component {
             title: 'Modificar categoría',
             html:
                 '<label for="swal-input1">Nombre</label></br>' +
-                '<input id="swal-input1" class="swal2-input" style="margin-top:5px;margin-bottom:0;" value="' + 
+                '<input id="swal-input1" class="swal2-input" style="margin-top:5px;margin-bottom:0;max-width:70%;" value="' + 
                 currentName + 
                 '"/></br>' +
                 '<p id="error_1" style="display:none; color:red;">El nombre no puede estar vacío</p>' +

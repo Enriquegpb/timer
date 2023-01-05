@@ -4,7 +4,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './css/Login.css';
 import { NavLink } from 'react-router-dom';
 
+import service from '../services/service';
+
 export class Login extends Component {
+
+    currentService = new service();
 
     userbox = React.createRef();
     passwordbox = React.createRef();
@@ -25,15 +29,10 @@ export class Login extends Component {
 
     setLogin = (e) => {
         e.preventDefault();
-        /*
-            #1 (GIO) TO (GUTI/SERGIO) ->
-            Resumen: Prepara esta zona para generar el token.
-            Pregunta: ¿Al final dónde se va a guardar el token?
-            Nota: Sustituir el setItem de abajo por el token correcto,
-                  lo que había era solo para hacer la prueba de diseño.
-        */
-        localStorage.setItem("token", this.userbox.current.value + " " + this.passwordbox.current.value);
-        this.updateToken();
+        this.currentService.generateToken(this.userbox.current.value, this.passwordbox.current.value).then((result) => {
+            localStorage.setItem("token", result.response);
+            this.updateToken();
+        });
     }
 
     signout = () => {

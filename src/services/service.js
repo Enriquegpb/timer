@@ -78,4 +78,28 @@ export default class service {
         });
     }
 
+    getTemporizadores() {
+        var url = Global.mainUrl + "api/timers";
+        return new Promise(function(resolve) {
+            axios.get(url).then(response => {
+                resolve(response.data);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    getCategoria(idcategoria) {
+        var url = Global.mainUrl + "api/categoriastimer/" + idcategoria;
+        return new Promise(function(resolve) {
+            axios.get(url).then(response => {
+                resolve(response.data);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
 }

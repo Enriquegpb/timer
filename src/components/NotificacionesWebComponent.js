@@ -1,20 +1,38 @@
-import React, { Component } from 'react'
-/**
- * Ejemplo de Vibracion en REACT pulsando un botón
- */
+import React, { Component } from "react";
+import Sound from 'react-sound';
 export default class NotificacionesWebComponent extends Component {
-    handleAction = () => {
-      navigator.vibrate(1000);
-    }
+  state = {
+    status: false,
+  };
 
-    componentDidMount=()=>{
-      this.handleAction();
-    }
-  
-    render() {
-      return (
-        <button onClick={this.handleAction}>Perform Action</button>
-      );
-    }
-  
+  acabarTimer=()=>{
+    this.setState({ 
+      status:true
+    })
+  }
+  render() {
+    if(this.state.status===true)
+    return (
+      <div>
+        NotificacionesWebComponent
+        {
+          this.state.status && 
+          <Sound
+          url="../assets/timbre.mp3"
+          playStatus={Sound.status.PLAYING}
+          onFinishedPlaying={() => console.log('Finished playing')}
+        />
+    
+        }
+
+      </div>
+    );
+    else
+    return(
+      <div>
+        <h1>Todavía tengo tiempo</h1>
+        <button onClick={this.acabarTimer}>acabar timer</button>
+      </div>
+    )
+  }
 }

@@ -127,7 +127,7 @@ export class Empresas extends Component {
                 auxiliar.fill(newCompany, index, index+1);
                 this.setState({
                     empresas : auxiliar
-                })
+                });
             }
             if (result.isDenied) {
                 auxiliar.splice(index, 1);

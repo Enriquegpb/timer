@@ -27,7 +27,7 @@ export class Menu extends Component {
                         <img src={menuicon} alt="Icono de tres líneas para el menú"/>
                     </button>
                     {/* 
-                        #1 (GIO) TO (GUTI/SERGIO) ->
+                        #1 (GIO) TO (GUTI) ->
                         Resumen: NECESITO UN DIV CON EL VALOR DE TIEMPO HASTA EL FIN DEL EVENTO (hh:mm:ss) 
                         Ejemplo: <div>07:15:27</div>
                         A tener en cuentra: Si aún no se ha configurado el horario (por ende no hay hora 

@@ -262,10 +262,10 @@
     margin: 15px auto 0 auto;
     padding: 8px;
     text-decoration: none;
-    font-family: Nexa;
+    font-family: Share;
     font-weight: 1000;
     font-size: 30px;
-    width: 60vw;
+    width: 70vw;
     color: var(--bkg_button_sala);
     background-color: var(--clr_button_sala);
     border: none;

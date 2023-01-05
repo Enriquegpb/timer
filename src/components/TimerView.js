@@ -3,14 +3,35 @@ import './css/TimerView.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle';
 
+import service from '../services/service';
+
 /* SUBCOMPONENTES */
 import SalaPopUp from './SalaPopUp';
 
 export class TimerView extends Component {
+    currentService = new service();
+
     state = {
-        time : 0,               // Almacena el tiempo principal que se consume y se muestra
-        room_name : "SALA",     // Almacena el nombre de la sala actual
-        statusSalaPopUp : false // Almacena la aparición o no del PopUp de selección de sala
+        time : 0,                // Almacena el tiempo principal que se consume y se muestra
+        sala_id : null,          // Almacena el id de la sala actual
+        sala_nombre : null,      // Almacena el nombre de la sala actual
+        timer_id : 1,            // Almacena el id del temporizador que aparece en pantalla
+        empresa_id : null,
+        empresa_nombre : null,
+        next_timers : [],
+        next_c1 : "",
+        next_e1 : "",
+        next_c2 : "",
+        next_e2 : "",
+        statusSalaPopUp : false, // Almacena la aparición o no del PopUp de selección de sala
+        checkCompany : false
+    }
+
+    componentDidMount = () => {
+        this.currentService.getSalas().then((result) => {
+            this.changeRoom(result[0].nombreSala, result[0].idSala);
+        }); // Cargamos el nombre de la primera sala habilitada
+        this.getNextTimers();
     }
 
     changeStatusSalaPopUp = () => {
@@ -19,43 +40,119 @@ export class TimerView extends Component {
         });
     }
 
-    changeRoomName = (name) => {
+    changeRoom = (name, id) => {
         this.setState({
-            room_name : name
+            sala_id : id,
+            sala_nombre : name
+        }, () => {
+            this.checkCompany();
+            this.getNextTimers();
+        });
+    }
+
+    checkCompany = () => { // Método para comprobar si hay empresa en el momento actual (tiempos_empresas_salas)
+        var res = false;
+        this.currentService.getTES().then((result) => {
+            result.forEach(element => {
+                if (element.idSala === this.state.sala_id && element.idTimer === this.state.timer_id) {
+                    res = true;
+                    this.setState({
+                        empresa_id : element.idEmpresa
+                    }, () => {this.getCompanyName()});
+                }
+            });
+        }).then(() => {
+            this.setState({
+                checkCompany : res
+            });
+        });
+    }
+
+    getNextTimers = () => {
+        var correct_position = -1;
+        var nextTimers = [];
+        this.currentService.getTemporizadores().then((result) => {
+            result.sort(function (a, b) {
+                return a.inicio.substring(a.inicio.length - 8).localeCompare(b.inicio.substring(a.inicio.length - 8));
+            }); // Se han ordenado los timers por hora más temprana -> hora más tarde
+            result.forEach((element, index) => {
+                if (new Date(element.inicio).getTime() > new Date().getTime() && correct_position === -1) {
+                    correct_position = index;
+                }
+            });
+            nextTimers.push(result[correct_position]);
+            nextTimers.push(result[correct_position+1]);
+        }).then(() => {
+            this.setState({
+                next_timers : nextTimers
+            }, () => {
+                this.getCategoryName(this.state.next_timers[0].idCategoria, true);
+                this.getCategoryName(this.state.next_timers[1].idCategoria, false);
+                this.getLineName(this.state.next_timers[0].idTemporizador, true);
+                this.getLineName(this.state.next_timers[1].idTemporizador, false);
+            });
+        });
+    }
+
+    getCompanyName = () => {
+        this.currentService.getEmpresa(this.state.empresa_id).then((result) => {
+            this.setState({
+                empresa_nombre : result.nombreEmpresa
+            });
+        });
+    }
+
+    getLineName = (identificador, lineaUno) => {
+        this.currentService.getTES().then((result) => {
+            result.forEach(element => {
+                if (element.idSala === this.state.sala_id && element.idTimer === identificador) {
+                    this.currentService.getEmpresa(element.idEmpresa).then((result_2) => {
+                        if (lineaUno) {
+                            this.setState({ next_e1 : result_2.nombreEmpresa });
+                        } else {
+                            this.setState({ next_e2 : result_2.nombreEmpresa });
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    getCategoryName = (identificador, lineaUno) => {
+        this.currentService.getCategoria(identificador).then((result) => {
+            if (lineaUno) {
+                this.setState({ next_c1 : result.categoria });
+            } else {
+                this.setState({ next_c2 : result.categoria });
+            }
         });
     }
 
     render() {
         return (
             <div>
-                {   // Subcomponente SalaPopUp (se incluirá cuando su status se modifique)
+                {
                     this.state.statusSalaPopUp && (
-                        <SalaPopUp changeStatusSalaPopUp={this.changeStatusSalaPopUp} changeRoomName={this.changeRoomName} />
+                        <SalaPopUp changeStatusSalaPopUp={this.changeStatusSalaPopUp} changeRoom={this.changeRoom} />
                     )
                 }
                 <header>
                     <button className='mainsala noselect' onClick={ () => this.changeStatusSalaPopUp() }>
-                        {this.state.room_name}
+                        {this.state.sala_nombre}
                     </button>
-                    <p className='maincompany noselect'>
-                        {/* 
-                            #2 (GIO) TO (SERGIO) ->
-                            Resumen: Al igual que con el apartado 'Siguiente', es necesario incluir
-                            un condicional en el que se modifique el contenido de este apartado
-                            según el momento en el que nos encontremos. 
-                            
-                            Explicación: Es posible que tengamos textos del tipo:
-
-                                            Está hablando:
-                                         Nombre de la empresa
-                                                  -
-                                      Nos encontramos en descanso
-                                         
-                         */}
-                        <b>Está hablando:</b><br/><i>Nombre de la empresa</i>
-                    </p>
+                        {
+                            this.state.checkCompany ? (
+                                <p className='maincompany noselect'>
+                                    <b>Está hablando:</b><br/><i>{this.state.empresa_nombre}</i>
+                                </p>
+                            ) : (
+                                <p className='maincompany noselect'>
+                                    <b>Descanso</b><br/><i>Ninguna empresa está hablando</i>
+                                </p>
+                            )
+                        }
                 </header>
-                <div className='maincircle mainshadow shadowcircle'>
+                <div className='maincircle mainshadow shadowcircle' onClick={() => this.getNextTimers()}>
                     <span className='valuecircle noselect'>
                         {/* 
                             #1 (GIO) TO (GUTI/SERGIO) ->
@@ -65,56 +162,21 @@ export class TimerView extends Component {
                         15:27
                     </span>
                 </div>
-                <footer className='noselect'>
-                    <b>Siguiente:</b>
-                    {/* 
-                        #1 (GIO) TO (SERGIO) ->
-                        Resumen: NECESITO UN MÉTODO QUE ME DEVUELVA EL NOMBRE DE LA EMPRESA 
-                        (Lo pondré dentro de los 'i' tag) Y UN MÉTODO QUE ME DEVUELVA EL NOMBRE 
-                        DE LA CATEGORÍA DEL TEMPORIZADOR QUE VA A CONTINUACIÓN.
-
-                        Explicación: En esta parte del componente se mostrarán los DOS siguientes 
-                        'timers' de la SALA en la que nos situamos. Es decir, DEPENDIENDO de la
-                        sala seleccionada en el menú de sala, esta información se va a actualizar.
-
-                        Ideas planteadas:
-                            #1 Se ha planteado la idea de que en este mismo componente se almacene un
-                               array con los string de las empresas y categorías que van a ir en cada
-                               'momento del evento'. Entendemos 'momento' como la posición que ocupan 
-                               dichos string en el array. (O podrían ser 2 arrays, ns estudiarlo)
-                               
-                               Ejemplo de un posible array: 
-                                            
-                                            array[
-                                                {"Nombre empresa A", "WORK"},
-                                                {"Nombre empresa B", "WORK"},
-                                            ]
-                                
-                                Entonces en el componente pondría:
-                                    Siguiente:
-                                            Nombre empresa A (WORK) -> Que sería el momento 1 (09:00 - 09:15)
-                                            Nombre empresa B (WORK) -> Que sería el momento 2 (09:15 - 09:30)
-
-                        Casos especiales: Existen categorías (BREAK, LARGE BREAK) en las que no existe
-                        nombre de empresa. Quizás podríamos devolver un texto por defecto para esos casos,
-                        como 'Descanso' o dejarlo en blanco o no sé si la API te deja guardar una descripción
-                        de dicha categoría, etc. De nuevo estudiarlo, yo no he visto la API, lo que me conteis
-                        que se pueda hacer, se hace.
-                                
-                        Métodos que pueden ayudar: El método 'changeRoomName' ya está a la escucha de
-                        cuando se produce dicho cambio de sala, pues es el que cambia el nombre de la
-                        sala mostrada. El problema es que no solo se cambia este apartado 'Siguiente'
-                        cuando cambias de sala sino cuando el timer agota su tiempo (habría que 
-                        coordinarse con Guti)
-
-                    */}
-                    <p>
-                        <i>Nombre de la empresa </i>(WORK)
-                    </p>
-                    <p>
-                        <i>Nombre de la empresa </i>(WORK)
-                    </p>
-                </footer>
+                {
+                    this.state.next_timers.length > 0 && (
+                        <footer className='noselect'>
+                            <b>Siguiente:</b>
+                            <p>
+                                <i>{this.state.next_e1}</i> ({this.state.next_c1}) 
+                                 - {this.state.next_timers[0].inicio.substring(this.state.next_timers[0].inicio.length - 8)}
+                            </p>
+                            <p>
+                                <i>{this.state.next_e2}</i> ({this.state.next_c2})
+                                 - {this.state.next_timers[1].inicio.substring(this.state.next_timers[1].inicio.length - 8)}
+                            </p>
+                        </footer>
+                    )
+                }
             </div>
         )
     }

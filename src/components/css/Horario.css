@@ -43,7 +43,7 @@ tr:last-child td:last-child {
 .schedule_buttons_rooms {
     border: 0;
     background-color: transparent;
-    padding: 5px;
+    padding: 12px;
     margin: 0 10px;
     display: inline-flex;
 }

@@ -90,15 +90,19 @@ export class Horario extends Component {
     }
     
     getCompany = (idtimer) => {
-        /*
-            #6 (GIO) TO (ALL)
-            Resumen: Necesito un método que me devuelva el nombre de la empresa
-                     asociada al timer pasado por parámetros. El idSala de la tabla
-                     'tiempos_empresas_salas' de la que sacamos la referencia de la 
-                     empresa, debe ser igual a la sala en la que nos encontramos, es
-                     decir; debe ser igual al state sala_actual.
-        */
-        return "EMPRESA";
+        var res = "";
+        if (this.state.tiempos_empresas_salas && this.state.empresas) {
+            this.state.tiempos_empresas_salas.forEach(registro => {
+                if (registro.idTimer === idtimer && registro.idSala === this.state.salas[this.state.sala_actual].idSala) {
+                    this.state.empresas.forEach(empresa => {
+                        if (empresa.idEmpresa === registro.idEmpresa) {
+                            res = empresa.nombreEmpresa;
+                        }
+                    });
+                }
+            });
+        }
+        return res;
     }
 
     getCategory = (idcat) => {

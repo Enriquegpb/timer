@@ -9,11 +9,15 @@ export class Empresas extends Component {
     currentService = new service();
 
     state = {
-        empresas : []
+        empresas : [],
+        token : false
     }
 
     componentDidMount = () => {
         this.loadCompanies();
+        this.setState({
+            token : (localStorage.getItem("token") !== null)
+        });
     }
 
     loadCompanies = () => {
@@ -61,65 +65,67 @@ export class Empresas extends Component {
     }
 
     modifyCompany = (index) => {
-        var currentName = this.state.empresas[index].nombreEmpresa;
-        Swal.fire({
-            title: 'Modificar empresa',
-            input: 'text',
-            inputLabel: 'Nombre',
-            inputValue: currentName,
-            showDenyButton: true,
-            showCancelButton: true,
-            confirmButtonText: "Guardar empresa",
-            confirmButtonColor: "#2C4D9E",
-            denyButtonText: "Eliminar empresa",
-            denyButtonColor: "#FF0000",
-            cancelButtonText: "Cancelar",
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'El nuevo nombre de la empresa no debe estar en blanco';
-                } else {
-                    var auxiliar = this.state.empresas;
-                    var correcto = true;
-                    if (currentName.toUpperCase() !== value.toUpperCase()) {
-                        auxiliar.forEach(element => {
-                            if (value.toUpperCase() === element.nombreEmpresa.toUpperCase()) {
-                                correcto = false;       
-                            }
-                        });                        
+        if (this.state.token) {
+            var currentName = this.state.empresas[index].nombreEmpresa;
+            Swal.fire({
+                title: 'Modificar empresa',
+                input: 'text',
+                inputLabel: 'Nombre',
+                inputValue: currentName,
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: "Guardar empresa",
+                confirmButtonColor: "#2C4D9E",
+                denyButtonText: "Eliminar empresa",
+                denyButtonColor: "#FF0000",
+                cancelButtonText: "Cancelar",
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'El nuevo nombre de la empresa no debe estar en blanco';
+                    } else {
+                        var auxiliar = this.state.empresas;
+                        var correcto = true;
+                        if (currentName.toUpperCase() !== value.toUpperCase()) {
+                            auxiliar.forEach(element => {
+                                if (value.toUpperCase() === element.nombreEmpresa.toUpperCase()) {
+                                    correcto = false;       
+                                }
+                            });                        
+                        }
+                        if (!correcto) { return 'Ya existe una empresa con el mismo nombre' };
                     }
-                    if (!correcto) { return 'Ya existe una empresa con el mismo nombre' };
                 }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) { // Modificar empresa
-                if (currentName.toUpperCase() !== result.value.toUpperCase()) {
-                    this.currentService.putEmpresa(this.state.empresas[index].idEmpresa, result.value).then((result_3) => {
+            }).then((result) => {
+                if (result.isConfirmed) { // Modificar empresa
+                    if (currentName.toUpperCase() !== result.value.toUpperCase()) {
+                        this.currentService.putEmpresa(this.state.empresas[index].idEmpresa, result.value).then((result_3) => {
+                            Swal.fire(
+                                'Empresa modificada',
+                                'Se ha modificado la empresa en la Base de datos\n(code: x' + result_3.status + ")",
+                                'success'
+                            );
+                            this.loadCompanies();
+                        });
+                    }
+                }
+                if (result.isDenied) { // Eliminar empresa
+                    this.currentService.deleteEmpresa(this.state.empresas[index].idEmpresa).then((result_4) => {
                         Swal.fire(
-                            'Empresa modificada',
-                            'Se ha modificado la empresa en la Base de datos\n(code: x' + result_3.status + ")",
+                            'Empresa eliminada',
+                            'Se ha eliminado la empresa de la Base de datos\n(code: x' + result_4.status + ")",
                             'success'
                         );
                         this.loadCompanies();
                     });
                 }
-            }
-            if (result.isDenied) { // Eliminar empresa
-                this.currentService.deleteEmpresa(this.state.empresas[index].idEmpresa).then((result_4) => {
-                    Swal.fire(
-                        'Empresa eliminada',
-                        'Se ha eliminado la empresa de la Base de datos\n(code: x' + result_4.status + ")",
-                        'success'
-                    );
-                    this.loadCompanies();
-                });
-            }
-        });
+            });   
+        }
     }
 
     render() {
         return (
             <div>
-                <h1 className='timer_title'>EMPRESAS</h1>
+                <h1 className='timer_title noselect'>EMPRESAS</h1>
                 <div className='content_box'>
                     {
                         this.state.empresas && (
@@ -134,11 +140,15 @@ export class Empresas extends Component {
                             })
                         )
                     }
-                    <div className='box_empresa last_item' onClick={() => this.generateCompany()}>
-                        <p className='box_empresa_target noselect'>
-                            <img src={plusicon} alt="Icono más" className='plusicon'/>
-                        </p>
-                    </div>
+                    {
+                        this.state.token && (
+                            <div className='box_empresa last_item' onClick={() => this.generateCompany()}>
+                                <p className='box_empresa_target noselect'>
+                                    <img src={plusicon} alt="Icono más" className='plusicon'/>
+                                </p>
+                            </div>
+                        )
+                    }
                 </div>
             </div>
         )

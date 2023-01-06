@@ -6,12 +6,16 @@ import './css/Temporizadores.css';
 export class Temporizadores extends Component {
     state = {
         temporizadores : [],
-        categorias : []
+        categorias : [],
+        token : false
     }
 
     componentDidMount = () => {
         this.loadTimers();
         this.loadCategories();
+        this.setState({
+            token : (localStorage.getItem("token") !== null)
+        });
     }
 
     loadTimers = () => {
@@ -139,55 +143,57 @@ export class Temporizadores extends Component {
     }
 
     modifyTimer = (index) => {
-        new Swal({
-            title: 'Modificar temporizador',
-            html:
-                '<label for="swal-input1">Hora de inicio</label></br>' +
-                '<input type="time" id="swal-input1" class="swal2-input" style="margin-top:5px;" value="' + 
-                this.state.temporizadores[index].inicio + 
-                '"/></br>' +
-                '<p id="error_1" style="display:none; color:red;">Por favor, inserte una hora válida</p></br>' +
-                '<label for="swal-input2">Categoría</label></br>' +
-                '<select  id="swal-input2" class="swal2-input" style="margin-top:5px; width:70%;">' + 
-                this.getOptionsCategories(this.state.temporizadores[index].idcategoria) + 
-                '</select>',
-            focusConfirm: false,
-            showCancelButton: true,
-            confirmButtonText: "Aceptar",
-            confirmButtonColor: '#2C4D9E',
-            cancelButtonText: "Cancelar",
-            preConfirm: () => {
-                if (document.getElementById('swal-input1').value === "") {
-                    document.getElementById('error_1').style.display = 'inline-block';
-                    return false;
-                } else {
-                    return [
-                        document.getElementById('swal-input1').value,
-                        document.getElementById('swal-input2').value
-                    ]
+        if (this.state.token) {
+            new Swal({
+                title: 'Modificar temporizador',
+                html:
+                    '<label for="swal-input1">Hora de inicio</label></br>' +
+                    '<input type="time" id="swal-input1" class="swal2-input" style="margin-top:5px;" value="' + 
+                    this.state.temporizadores[index].inicio + 
+                    '"/></br>' +
+                    '<p id="error_1" style="display:none; color:red;">Por favor, inserte una hora válida</p></br>' +
+                    '<label for="swal-input2">Categoría</label></br>' +
+                    '<select  id="swal-input2" class="swal2-input" style="margin-top:5px; width:70%;">' + 
+                    this.getOptionsCategories(this.state.temporizadores[index].idcategoria) + 
+                    '</select>',
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: "Aceptar",
+                confirmButtonColor: '#2C4D9E',
+                cancelButtonText: "Cancelar",
+                preConfirm: () => {
+                    if (document.getElementById('swal-input1').value === "") {
+                        document.getElementById('error_1').style.display = 'inline-block';
+                        return false;
+                    } else {
+                        return [
+                            document.getElementById('swal-input1').value,
+                            document.getElementById('swal-input2').value
+                        ]
+                    }
                 }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                /*
-                    #4 (GIO) TO (GUTI/SERGIO) ->
-                    Resumen: Prepara esta zona para agregar el temporizador modificado en la BBDD.
-                */
-                var newTimer = {
-                    idtimer : 1000, // Se le pasa su propio ID o da igual????
-                    inicio : result.value[0],
-                    idcategoria : Number.parseInt(result.value[1]),
-                    pausa : false // No necesario
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    /*
+                        #4 (GIO) TO (GUTI/SERGIO) ->
+                        Resumen: Prepara esta zona para agregar el temporizador modificado en la BBDD.
+                    */
+                    var newTimer = {
+                        idtimer : 1000, // Se le pasa su propio ID o da igual????
+                        inicio : result.value[0],
+                        idcategoria : Number.parseInt(result.value[1]),
+                        pausa : false // No necesario
+                    }
+                    var auxiliar = this.state.temporizadores;
+                        auxiliar.fill(newTimer, index, index+1);
+                    this.setState({
+                        temporizadores : auxiliar
+                    }, () => {
+                        // console.log(JSON.stringify(this.state.temporizadores));
+                    })
                 }
-                var auxiliar = this.state.temporizadores;
-                    auxiliar.fill(newTimer, index, index+1);
-                this.setState({
-                    temporizadores : auxiliar
-                }, () => {
-                    // console.log(JSON.stringify(this.state.temporizadores));
-                })
-            }
-        });
+            });
+        }
     }
 
     getNameCategory = (idcategoria) => {
@@ -208,7 +214,7 @@ export class Temporizadores extends Component {
     render() {
         return (
             <div>
-                <h1 className='timer_title'>TEMPORIZADORES</h1>
+                <h1 className='timer_title noselect'>TEMPORIZADORES</h1>
                 <div className='content_box'>
                     {
                         this.state.temporizadores.map((tempo, index) => {
@@ -227,10 +233,14 @@ export class Temporizadores extends Component {
                             )
                         })
                     }
-                    <div className='box_temporizador' onClick={() => this.generateTimer()}>
-                        <div></div> {/* No tocar */}
-                        <img src={plusicon} alt="Icono más" className='plusicon noselect'/>
-                    </div>
+                    {
+                        this.state.token && (
+                            <div className='box_temporizador' onClick={() => this.generateTimer()}>
+                                <div></div> {/* No tocar */}
+                                <img src={plusicon} alt="Icono más" className='plusicon noselect'/>
+                            </div>
+                        )
+                    }
                 </div>
             </div>
         )

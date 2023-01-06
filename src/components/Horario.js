@@ -17,7 +17,8 @@ export class Horario extends Component {
         tiempos_empresas_salas : null,
         salas : null,
         sala_actual : 0,
-        edit_mode : false
+        edit_mode : false,
+        token : false
     }
 
     componentDidMount = () => {
@@ -26,6 +27,9 @@ export class Horario extends Component {
         this.loadCategories();
         this.loadCompanies();
         this.loadTiemposEmpresasSalas();
+        this.setState({
+            token : (localStorage.getItem("token") !== null)
+        });
     }
 
     loadRooms = () => {
@@ -309,9 +313,13 @@ export class Horario extends Component {
         return (
             <div>
                 <h1 className='timer_title noselect'>HORARIO</h1>
-                <button id="button_edit_schedule" className='button_edit_schedule' onClick={() => this.changeMode()}>
-                    Editar empresas
-                </button>
+                {
+                    this.state.toke && (
+                        <button id="button_edit_schedule" className='button_edit_schedule' onClick={() => this.changeMode()}>
+                            Editar empresas
+                        </button>
+                    )
+                }
                 <div className='schedule_table_box'>
                     <table className='schedule_table noselect'>
                         <thead>

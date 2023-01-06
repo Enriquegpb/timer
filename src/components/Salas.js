@@ -9,11 +9,15 @@ import plusicon from '../assets/plus.svg';
 export class Salas extends Component {
     currentService = new service();
     state = {
-        salas : []
+        salas : [],
+        token : false
     }
 
     componentDidMount = () => {
         this.loadRooms();
+        this.setState({
+            token : (localStorage.getItem("token") !== null)
+        });
     }
 
     loadRooms = () => {
@@ -62,59 +66,61 @@ export class Salas extends Component {
     }
 
     modifyRoom = (index) => {
-        var currentName = this.state.salas[index].nombreSala;
-        Swal.fire({
-            title: 'Modificar sala',
-            input: 'text',
-            inputLabel: 'Nombre',
-            inputValue: currentName,
-            showDenyButton: true,
-            showCancelButton: true,
-            confirmButtonText: "Guardar sala",
-            confirmButtonColor: "#2C4D9E",
-            denyButtonText: "Eliminar sala",
-            denyButtonColor: "#FF0000",
-            cancelButtonText: "Cancelar",
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'El nuevo nombre de la sala no debe estar en blanco';
-                } else {
-                    var auxiliar = this.state.salas;
-                    var correcto = true;
-                    if (currentName.toUpperCase() !== value.toUpperCase()) {
-                        auxiliar.forEach(element => {
-                            if (value.toUpperCase() === element.nombreSala.toUpperCase()) {
-                                correcto = false;       
-                            }
-                        });                        
+        if (this.state.token) {
+            var currentName = this.state.salas[index].nombreSala;
+            Swal.fire({
+                title: 'Modificar sala',
+                input: 'text',
+                inputLabel: 'Nombre',
+                inputValue: currentName,
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: "Guardar sala",
+                confirmButtonColor: "#2C4D9E",
+                denyButtonText: "Eliminar sala",
+                denyButtonColor: "#FF0000",
+                cancelButtonText: "Cancelar",
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'El nuevo nombre de la sala no debe estar en blanco';
+                    } else {
+                        var auxiliar = this.state.salas;
+                        var correcto = true;
+                        if (currentName.toUpperCase() !== value.toUpperCase()) {
+                            auxiliar.forEach(element => {
+                                if (value.toUpperCase() === element.nombreSala.toUpperCase()) {
+                                    correcto = false;       
+                                }
+                            });                        
+                        }
+                        if (!correcto) { return 'Ya existe una sala con el mismo nombre' };
                     }
-                    if (!correcto) { return 'Ya existe una sala con el mismo nombre' };
                 }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) { // Modificación de la sala
-                if (currentName.toUpperCase() !== result.value.toUpperCase()) {
-                    this.currentService.putSala(this.state.salas[index].idSala, result.value).then(result_3 => {
+            }).then((result) => {
+                if (result.isConfirmed) { // Modificación de la sala
+                    if (currentName.toUpperCase() !== result.value.toUpperCase()) {
+                        this.currentService.putSala(this.state.salas[index].idSala, result.value).then(result_3 => {
+                            Swal.fire(
+                                'Sala modificada',
+                                'Se ha modificado la sala en la Base de datos\n(code: x' + result_3.status + ")",
+                                'success'
+                            );
+                            this.loadRooms();
+                        });
+                    }
+                }
+                if (result.isDenied) { // Eliminación de la sala 
+                    this.currentService.deleteSala(this.state.salas[index].idSala).then(result_4 => {
                         Swal.fire(
-                            'Sala modificada',
-                            'Se ha modificado la sala en la Base de datos\n(code: x' + result_3.status + ")",
+                            'Sala eliminada',
+                            'Se ha eliminado la sala de la Base de datos\n(code: x' + result_4.status + ")",
                             'success'
                         );
                         this.loadRooms();
-                    });
+                    })
                 }
-            }
-            if (result.isDenied) { // Eliminación de la sala 
-                this.currentService.deleteSala(this.state.salas[index].idSala).then(result_4 => {
-                    Swal.fire(
-                        'Sala eliminada',
-                        'Se ha eliminado la sala de la Base de datos\n(code: x' + result_4.status + ")",
-                        'success'
-                    );
-                    this.loadRooms();
-                })
-            }
-        });
+            });  
+        }
     }
 
     render() {
@@ -133,11 +139,15 @@ export class Salas extends Component {
                             )
                         })
                     }
-                    <div className='box_sala last_item' onClick={() => this.generateRoom()}>
-                        <p className='box_sala_target noselect'>
-                            <img src={plusicon} alt="Icono más" className='plusicon'/>
-                        </p>
-                    </div>
+                    {
+                        this.state.token && (
+                            <div className='box_sala last_item' onClick={() => this.generateRoom()}>
+                                <p className='box_sala_target noselect'>
+                                    <img src={plusicon} alt="Icono más" className='plusicon'/>
+                                </p>
+                            </div>
+                        )
+                    }
                 </div>
             </div>
       )

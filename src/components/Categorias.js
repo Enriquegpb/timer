@@ -9,11 +9,15 @@ export class Categorias extends Component {
     currentService = new service();
 
     state = {
-        categorias : null
+        categorias : null,
+        token : false
     }
 
     componentDidMount = () => {
         this.loadcategories();
+        this.setState({
+            token : (localStorage.getItem("token") !== null)
+        });
     }
 
     loadcategories = () => {
@@ -117,99 +121,101 @@ export class Categorias extends Component {
     }
 
     modifyCategory = (index) => {
-        var currentName = this.state.categorias[index].categoria;
-        var currentDuration = this.state.categorias[index].duracion;
-        new Swal({
-            title: 'Modificar categoría',
-            html:
-                '<label for="swal-input1">Nombre</label></br>' +
-                '<input id="swal-input1" class="swal2-input" style="margin-top:5px;margin-bottom:0;max-width:70%;" value="' + 
-                currentName + 
-                '"/></br>' +
-                '<p id="error_1" style="display:none; color:red;">El nombre no puede estar vacío</p>' +
-                '<p id="error_2" style="display:none; color:red;">Ya existe una categoría con el mismo nombre</p>' +
-                '</br><label for="swal-input2">Duración</label></br>' +
-                '<input type="time" id="swal-input2" class="swal2-input" value="' + 
-                this.transformMinutes(this.state.categorias[index].duracion, false) + 
-                '" style="margin-top:5px;"/></br>' +
-                '<p id="error_3" style="display:none; color:red; margin-bottom:0;">Tiempo mínimo: 1 minuto</p>',
-            focusConfirm: false,
-            showDenyButton: true,
-            showCancelButton: true,
-            confirmButtonText: "Guardar categoría",
-            confirmButtonColor: "#2C4D9E",
-            denyButtonText: "Eliminar categoría",
-            denyButtonColor: "#FF0000",
-            cancelButtonText: "Cancelar",
-            preConfirm: () => {
-                if(!document.getElementById('swal-input1').value){
-                    document.getElementById('error_1').style.display = 'inline-block';
-                    document.getElementById('error_2').style.display = 'none';
-                    document.getElementById('error_3').style.display = 'none';
-                    return false;
-                } else if(document.getElementById('swal-input2').value === "00:00") {
-                    document.getElementById('error_1').style.display = 'none';
-                    document.getElementById('error_2').style.display = 'none';
-                    document.getElementById('error_3').style.display = 'inline-block';
-                    return false;
-                } else {
-                    var correcto = true;
-                    var newName = document.getElementById('swal-input1').value.toUpperCase();
-                    if (newName !== currentName.toUpperCase()) {
-                        this.state.categorias.forEach(element => {
-                            if (element.categoria.toUpperCase() === newName) {
-                                correcto = false;
-                            }
-                        });
-                    }
-                    if (correcto) {
-                        return [
-                            document.getElementById('swal-input1').value,
-                            document.getElementById('swal-input2').value
-                        ]                        
-                    } else {
-                        document.getElementById('error_1').style.display = 'none';
-                        document.getElementById('error_2').style.display = 'inline-block';
+        if (this.state.token) {
+            var currentName = this.state.categorias[index].categoria;
+            var currentDuration = this.state.categorias[index].duracion;
+            new Swal({
+                title: 'Modificar categoría',
+                html:
+                    '<label for="swal-input1">Nombre</label></br>' +
+                    '<input id="swal-input1" class="swal2-input" style="margin-top:5px;margin-bottom:0;max-width:70%;" value="' + 
+                    currentName + 
+                    '"/></br>' +
+                    '<p id="error_1" style="display:none; color:red;">El nombre no puede estar vacío</p>' +
+                    '<p id="error_2" style="display:none; color:red;">Ya existe una categoría con el mismo nombre</p>' +
+                    '</br><label for="swal-input2">Duración</label></br>' +
+                    '<input type="time" id="swal-input2" class="swal2-input" value="' + 
+                    this.transformMinutes(this.state.categorias[index].duracion, false) + 
+                    '" style="margin-top:5px;"/></br>' +
+                    '<p id="error_3" style="display:none; color:red; margin-bottom:0;">Tiempo mínimo: 1 minuto</p>',
+                focusConfirm: false,
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: "Guardar categoría",
+                confirmButtonColor: "#2C4D9E",
+                denyButtonText: "Eliminar categoría",
+                denyButtonColor: "#FF0000",
+                cancelButtonText: "Cancelar",
+                preConfirm: () => {
+                    if(!document.getElementById('swal-input1').value){
+                        document.getElementById('error_1').style.display = 'inline-block';
+                        document.getElementById('error_2').style.display = 'none';
                         document.getElementById('error_3').style.display = 'none';
                         return false;
+                    } else if(document.getElementById('swal-input2').value === "00:00") {
+                        document.getElementById('error_1').style.display = 'none';
+                        document.getElementById('error_2').style.display = 'none';
+                        document.getElementById('error_3').style.display = 'inline-block';
+                        return false;
+                    } else {
+                        var correcto = true;
+                        var newName = document.getElementById('swal-input1').value.toUpperCase();
+                        if (newName !== currentName.toUpperCase()) {
+                            this.state.categorias.forEach(element => {
+                                if (element.categoria.toUpperCase() === newName) {
+                                    correcto = false;
+                                }
+                            });
+                        }
+                        if (correcto) {
+                            return [
+                                document.getElementById('swal-input1').value,
+                                document.getElementById('swal-input2').value
+                            ]                        
+                        } else {
+                            document.getElementById('error_1').style.display = 'none';
+                            document.getElementById('error_2').style.display = 'inline-block';
+                            document.getElementById('error_3').style.display = 'none';
+                            return false;
+                        }
                     }
                 }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) { // Modificar categoría
-                if (result.value[0].toUpperCase() !== currentName.toUpperCase() || this.transformDuration(result.value[1]) !== currentDuration) {
-                    var newCategory = {
-                        idCategoria : this.state.categorias[index].idCategoria,
-                        categoria : result.value[0],
-                        duracion : this.transformDuration(result.value[1])
+            }).then((result) => {
+                if (result.isConfirmed) { // Modificar categoría
+                    if (result.value[0].toUpperCase() !== currentName.toUpperCase() || this.transformDuration(result.value[1]) !== currentDuration) {
+                        var newCategory = {
+                            idCategoria : this.state.categorias[index].idCategoria,
+                            categoria : result.value[0],
+                            duracion : this.transformDuration(result.value[1])
+                        }
+                        this.currentService.putCategoria(newCategory).then((result) => {
+                            Swal.fire(
+                                'Categoría modificada',
+                                'Se ha modificado la categoría en la Base de datos\n(code: x' + result.status + ")",
+                                'success'
+                            );
+                            this.loadcategories();
+                        });
                     }
-                    this.currentService.putCategoria(newCategory).then((result) => {
+                }
+                if (result.isDenied) { // Eliminar categoría
+                    this.currentService.deleteCategoria(this.state.categorias[index].idCategoria).then((result_2) => {
                         Swal.fire(
-                            'Categoría modificada',
-                            'Se ha modificado la categoría en la Base de datos\n(code: x' + result.status + ")",
+                            'Categoría eliminada',
+                            'Se ha eliminado la categoría en la Base de datos\n(code: x' + result_2.status + ")",
                             'success'
                         );
                         this.loadcategories();
                     });
                 }
-            }
-            if (result.isDenied) { // Eliminar categoría
-                this.currentService.deleteCategoria(this.state.categorias[index].idCategoria).then((result_2) => {
-                    Swal.fire(
-                        'Categoría eliminada',
-                        'Se ha eliminado la categoría en la Base de datos\n(code: x' + result_2.status + ")",
-                        'success'
-                    );
-                    this.loadcategories();
-                });
-            }
-        });
+            });
+        }
     }
 
     render() {
         return (
             <div>
-                <h1 className='timer_title'>CATEGORÍAS</h1>
+                <h1 className='timer_title noselect'>CATEGORÍAS</h1>
                 <div className='content_box'>
                     {
                         this.state.categorias && (
@@ -225,11 +231,15 @@ export class Categorias extends Component {
                             })
                         )
                     }
-                    <div className='box_categoria last_item' onClick={() => this.generateCategories()}>
-                        <p className='box_categoria_target_plus noselect'>
-                            <img src={plusicon} alt="Icono más" className='plusicon'/>
-                        </p>
-                    </div>
+                    {
+                        this.state.token && (
+                            <div className='box_categoria last_item' onClick={() => this.generateCategories()}>
+                                <p className='box_categoria_target_plus noselect'>
+                                    <img src={plusicon} alt="Icono más" className='plusicon'/>
+                                </p>
+                            </div>
+                        )
+                    }
                 </div>
             </div>
         )

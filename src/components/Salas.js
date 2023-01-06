@@ -93,14 +93,16 @@ export class Salas extends Component {
             }
         }).then((result) => {
             if (result.isConfirmed) { // Modificación de la sala
-                this.currentService.putSala(this.state.salas[index].idSala, result.value).then(result_3 => {
-                    Swal.fire(
-                        'Sala modificada',
-                        'Se ha modificado la sala en la Base de datos\n(code: x' + result_3.status + ")",
-                        'success'
-                    );
-                    this.loadRooms();
-                });
+                if (currentName.toUpperCase() !== result.value.toUpperCase()) {
+                    this.currentService.putSala(this.state.salas[index].idSala, result.value).then(result_3 => {
+                        Swal.fire(
+                            'Sala modificada',
+                            'Se ha modificado la sala en la Base de datos\n(code: x' + result_3.status + ")",
+                            'success'
+                        );
+                        this.loadRooms();
+                    });
+                }
             }
             if (result.isDenied) { // Eliminación de la sala 
                 this.currentService.deleteSala(this.state.salas[index].idSala).then(result_4 => {

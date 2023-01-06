@@ -138,16 +138,48 @@ export class Horario extends Component {
     }
 
     getOptionsCompanies = () => {
-        var auxiliar = '';
-        this.state.empresas.forEach((company) => {
-            auxiliar += '<option value="' + company.idempresa + '">' + 
-                            company.empresa +
-                        '</option>';
-        })
+        var auxiliar = "";
+        if (this.state.empresas) {
+            this.state.empresas.forEach(company => {
+                auxiliar += '<option value="' + company.idEmpresa + '">' + 
+                                company.nombreEmpresa +
+                            '</option>';
+            });    
+        }
         return auxiliar;
     }
 
-    createTimer = (index) => {
+    getExplication = (newRegister) => {
+        var empresa = "";
+        if (this.state.empresas) {
+            this.state.empresas.forEach(company => {
+                if (company.idEmpresa === newRegister.idEmpresa) {
+                    empresa = company.nombreEmpresa;
+                }
+            });    
+        }
+
+        var sala = "";
+        if (this.state.salas) {
+            this.state.salas.forEach(room => {
+                if (room.idSala === newRegister.idSala) {
+                    sala = room.nombreSala;
+                }
+            });    
+        }
+
+        var inicio = "";
+        if (this.state.temporizadores) {
+            this.state.temporizadores.forEach(timer => {
+                if (timer.idTemporizador === newRegister.idTimer) {
+                    inicio = this.getInicio(timer.inicio);
+                }
+            });    
+        }
+        return "'" + empresa + "' en la sala '" + sala + "' a las " + inicio;
+    }
+
+    createTES = (index) => {
         new Swal({
             title: 'Asignar empresa',
             html:
@@ -168,14 +200,15 @@ export class Horario extends Component {
         }).then((result) => {
             if (result.isConfirmed) {
                 var newRegister = {
-                    idtimer : this.state.temporizadores[index].idTemporizador,
-                    idempresa : Number.parseInt(result.value[0]),
+                    id : 0,
+                    idTimer : this.state.temporizadores[index].idTemporizador,
+                    idEmpresa : Number.parseInt(result.value[0]),
                     idSala : this.state.salas[this.state.sala_actual].idSala,
-                    idevento : 0
+                    idEvento : 1
                 }
                 new Swal({
                     title: '¿Datos correctos?',
-                    text: JSON.stringify(newRegister),
+                    text: this.getExplication(newRegister),
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
@@ -184,10 +217,13 @@ export class Horario extends Component {
                     cancelButtonText: 'No, cancelar'
                 }).then((subresult) => {
                     if (subresult.isConfirmed) {
-                        var auxiliar = this.state.tiempos_empresas_salas;
-                        auxiliar.push(newRegister);
-                        this.setState({
-                            tiempos_empresas_salas : auxiliar
+                        this.currentService.postTES(newRegister).then((result_tes_2) => {
+                            Swal.fire(
+                                'Empresa asignada',
+                                'Se ha asignado una empresa a este momento\n(code: x' + result_tes_2.status + ")",
+                                'success'
+                            );
+                            this.loadTiemposEmpresasSalas();
                         });
                     }
                 });
@@ -195,38 +231,36 @@ export class Horario extends Component {
         });
     }
 
-    deleteTimer = (idtimer) => {
-        /*
-            #9 (GIO) TO (ALL)
-            Resumen: Necesito un método que elimine en la tabla 'tiempos_empresas_salas'
-                     un registro cuyo idtimer sea igual al pasado por parámetros y cuyo
-                     idSala sea igual al que hay en la variable this.state.salas[this.state.sala_actual].idSala
-        */
-        var position = -1;
-        this.state.tiempos_empresas_salas.forEach((element, index) => {
-            if (element.idtimer === idtimer && element.idSala === this.state.salas[this.state.sala_actual].idSala) {
-                position = index;
-            }    
-        });
-
-        new Swal({
-            title: 'Quitar empresa',
-            text: "Se eliminará la empresa del timer seleccionado. Solo verá la categoría, hasta añadir una nueva empresa",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Sí',
-            cancelButtonText: 'No'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                var auxiliar = this.state.tiempos_empresas_salas;
-                auxiliar.splice(position, 1);
-                this.setState({
-                    tiempos_empresas_salas : auxiliar
-                });
-            }
-        });
+    deleteTES = (idtimer) => {
+        var idTes = -1;
+        if (this.state.tiempos_empresas_salas) {
+            this.state.tiempos_empresas_salas.forEach((registro, index) => {
+                if (registro.idTimer === idtimer && registro.idSala === this.state.salas[this.state.sala_actual].idSala) {
+                    idTes = registro.id;
+                }    
+            });
+            new Swal({
+                title: 'Quitar empresa',
+                text: "Se desasignará la empresa del temporizador seleccionado.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'No'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.currentService.deleteTES(idTes).then((result_tes) => {
+                        Swal.fire(
+                            'Empresa desasignada',
+                            'Ya no existe una empresa asignada a este momento\n(code: x' + result_tes.status + ")",
+                            'success'
+                        );
+                        this.loadTiemposEmpresasSalas();
+                    })
+                }
+            });
+        }   
     }
 
     getInicio = (string_init) => {
@@ -318,7 +352,7 @@ export class Horario extends Component {
                                                             {
                                                                 check ? (
                                                                     <div className='company_edit_box'>
-                                                                        <button className='company_edit_box_target_sub' onClick={() => this.deleteTimer(tempo.idTemporizador)}>
+                                                                        <button className='company_edit_box_target_sub' onClick={() => this.deleteTES(tempo.idTemporizador)}>
                                                                             <img src={subicon} className="addsub_icon" alt="Icono restar"/>
                                                                         </button>
                                                                         <div className='company_edit_box_target scroll'>
@@ -340,7 +374,7 @@ export class Horario extends Component {
                                                                                 -
                                                                             </p>
                                                                         </div>
-                                                                        <button className='company_edit_box_target_add' onClick={() => this.createTimer(index)}>
+                                                                        <button className='company_edit_box_target_add' onClick={() => this.createTES(index)}>
                                                                             <img src={plusicon} className="addsub_icon" alt="Icono añadir"/>
                                                                         </button>
                                                                     </div>

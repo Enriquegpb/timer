@@ -102,6 +102,30 @@ export default class service {
         });
     }
 
+    postTES(newRegister) {
+        var url = Global.mainUrl + "api/TiempoEmpresaSala";
+        return new Promise(function(resolve) {
+            axios.post(url, newRegister).then(response => {
+                resolve(response);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    deleteTES(idTES) {
+        var url = Global.mainUrl + "api/TiempoEmpresaSala/" + idTES;
+        return new Promise(function(resolve) {
+            axios.delete(url).then(response => {
+                resolve(response);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
     getEmpresas() {
         var url = Global.mainUrl + "api/empresas";
         return new Promise(function(resolve) {

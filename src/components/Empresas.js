@@ -3,34 +3,52 @@ import plusicon from '../assets/plus.svg';
 
 import Swal from 'sweetalert2';
 import './css/Empresas.css';
-
+import axios from 'axios';
+import Global from '../Global';
 export class Empresas extends Component {
-
-    componentDidMount = () => {
-        /*
-            #1 (GIO) TO (GUTI/SERGIO) ->
-            Resumen: Prepara el componentDidMount para cargar los nombres de las
-            categorías almacenadas en la BBDD.
-        */
-        this.setState({
-            empresas : [
-                {
-                    idempresa : 1,
-                    empresa : "Empresa 1",
-                    imagen : ""
-                },
-                {
-                    idempresa : 2,
-                    empresa : "Empresa 2",
-                    imagen : ""
-                },
-                {
-                    idempresa : 3,
-                    empresa : "Empresa 3",
-                    imagen : ""
-                },
-            ]
+    loadCompanies = () => {
+        var request = "/api/Empresas";
+        var url = Global.url + request;
+        console.log(url, request)
+        axios.get(url).then(res => {
+            console.log(res.data);
+            this.setState({
+                empresas : res.data
+            });
+            console.log("empresas almacenadas");
         });
+        
+    }
+    postCompanies = (newCompany) => {
+        var request = "/api/Empresas/CreateEmpresa/nombre";
+        var url = Global.url + request;
+        var company = 
+            {
+              idEmpresa: newCompany.idempresa,
+              nombreEmpresa: newCompany.empresa,
+              imagen: newCompany.imagen
+            }
+            console.log(company);
+        axios.post(url,company).then(response => {
+            console.log("Empresa agregada"); 
+        });
+    }
+    updateCompanies = (newCompany) => {
+        var request = "/api/Empresas/UpdateEmpresa/"+newCompany.idempresa+"/"+newCompany.empresa;
+        var url = Global.url + request;
+        var company={
+            
+                idCategoria: newCompany.idempresa,
+                categoria: newCompany.nombre,
+                imagen: newCompany.imagen
+              
+        }
+        axios.put(url,company).then(response => {
+            console.log("Empresa actualizada"); 
+        });
+    }
+    componentDidMount = () => {
+       this.loadCompanies();
     }
 
 
@@ -53,15 +71,16 @@ export class Empresas extends Component {
                     var auxiliar = this.state.empresas;
                     var correcto = true;
                     auxiliar.forEach(element => {
-                        if (value.toUpperCase() === element.empresa.toUpperCase()) {
-                            correcto = false;       
-                        }
+                        // if (value.toUpperCase() === element.empresa.toUpperCase()) {
+                        //     correcto = false;       
+                        // }
                     });
                     if (!correcto) { return 'Ya existe una empresa con el mismo nombre' };
                 }
             }
         }).then((result) => {
             if (result.isConfirmed) {
+                
                 /*
                     #2 (GIO) TO (GUTI/SERGIO) ->
                     Resumen: Prepara esta zona para agregar la nueva empresa en la BBDD.
@@ -77,6 +96,8 @@ export class Empresas extends Component {
                 this.setState({
                     empresas : auxiliar
                 });
+                console.log(newCompany);
+                this.postCompanies(newCompany);//Agrega el nombre de la nnueva empresa
             }
         });
     }
@@ -101,13 +122,13 @@ export class Empresas extends Component {
                 } else {
                     var auxiliar = this.state.empresas;
                     var correcto = true;
-                    if (currentName.toUpperCase() !== value.toUpperCase()) {
-                        auxiliar.forEach(element => {
-                            if (value.toUpperCase() === element.empresa.toUpperCase()) {
-                                correcto = false;       
-                            }
-                        });                        
-                    }
+                    // if (currentName.toUpperCase() !== value.toUpperCase()) {
+                    //     auxiliar.forEach(element => {
+                    //         if (value.toUpperCase() === element.empresa.toUpperCase()) {
+                    //             correcto = false;       
+                    //         }
+                    //     });                        
+                    // }
                     if (!correcto) { return 'Ya existe una empresa con el mismo nombre' };
                 }
             }
@@ -118,6 +139,7 @@ export class Empresas extends Component {
                     #3 (GIO) TO (GUTI/SERGIO) ->
                     Resumen: Prepara esta zona para actualizar la empresa en la BBDD.
                 */
+               
                 var newCompany = {
                     idempresa : this.state.empresas[index].idempresa,
                     empresa : result.value,
@@ -128,6 +150,8 @@ export class Empresas extends Component {
                 this.setState({
                     empresas : auxiliar
                 })
+                console.log(newCompany);
+                this.updateCompanies(newCompany);
             }
             if (result.isDenied) {
                 auxiliar.splice(index, 1);

@@ -3,34 +3,61 @@ import plusicon from '../assets/plus.svg';
 
 import Swal from 'sweetalert2';
 import './css/Categorias.css';
-
+import axios  from 'axios';
+import Global from './../Global'
 export class Categorias extends Component {
-
+    loadcategories = () => {
+        var request = "/api/CategoriasTimer";
+        var url = Global.url + request;
+        console.log(url, request)
+        axios.get(url).then(res => {
+            console.log(res.data);
+            this.setState({
+                categorias : res.data
+            });
+            console.log("categorías almacenadas");
+        });
+        
+    }
+    postcategories = (newCategory) => {
+        var request = "/api/CategoriasTimer";
+        var url = Global.url + request;
+        var categoria = {
+            idCategoria: newCategory.idcategoria,
+            categoria: newCategory.categoria,
+            duracion: newCategory.duracion
+          }
+          console.log(categoria);
+        axios.post(url,categoria).then(response => {
+            console.log("Categoria agregada"); 
+        });
+    }
+    updatecategories = (newCategory) => {
+        var request = "/api/CategoriasTimer";
+        var url = Global.url + request;
+           var categoria = {
+            idCategoria: newCategory.idcategoria,
+            categoria: newCategory.categoria,
+            duracion: newCategory.duracion
+          }
+          console.log(categoria);
+        axios.put(url,categoria).then(response => {
+            console.log("Categoria actualizada"); 
+        });
+    }
     componentDidMount = () => {
         /*
             #1 (GIO) TO (GUTI/SERGIO) ->
             Resumen: Prepara el componentDidMount para cargar los nombres de las
             categorías almacenadas en la BBDD.
         */
-        this.setState({
-            categorias : [
-                {
-                    idcategoria : 1,
-                    categoria : "CATEGORÍA 1",
-                    duracion : "00:15"
-                },
-                {
-                    idcategoria : 2,
-                    categoria : "Categoría 2",
-                    duracion : "00:30"
-                }
-            ]
-        });
+       this.loadcategories();
     }
 
 
     state = {
-        categorias : []
+        categorias : [],
+        status:false
     }
 
 
@@ -89,17 +116,19 @@ export class Categorias extends Component {
                 /*
                     #2 (GIO) TO (GUTI/SERGIO) ->
                     Resumen: Prepara esta zona para agregar la nueva categoría en la BBDD.
-                */
+                */     
                 var newCategory = {
                     idcategoria : this.state.categorias.length,
                     categoria : result.value[0],
-                    duracion : result.value[1]
+                    duracion : 20//AQUÍ HAY QUE PASARLE UN ENTERO , POR EL FORMATO DEL OBJETO JSON
                 }
                 var auxiliar = this.state.categorias;
                     auxiliar.push(newCategory);
                 this.setState({
                     categorias : auxiliar
                 })
+
+                this.postcategories(newCategory);
             }
         });
     }
@@ -169,14 +198,16 @@ export class Categorias extends Component {
                     #3 (GIO) TO (GUTI/SERGIO) ->
                     Resumen: Prepara esta zona para actualizar la categoría en la BBDD.
                 */
-                var newCategory = {
+               
+                var newCategory = {//TENGO QUE TENER EL CUERPO ENTERO PARA QUE FUNCIONE Correctamente el update!!
                     categoria : result.value[0],
-                    duracion : result.value[1]
+                    duracion : 20
                 }
                     auxiliar.fill(newCategory, index, index+1);
                 this.setState({
                     categorias : auxiliar
                 })
+                this.updatecategories(newCategory);//Tendremos que pasar el id de esta categoria que se quiere actualizar
             }
             if (result.isDenied) {
                 auxiliar.splice(index, 1);
@@ -188,7 +219,7 @@ export class Categorias extends Component {
     }
     
     getDuration = (duracion) => {
-        var mytime = duracion.split(":");
+        var mytime = ":";//duracion.split(":")
         if (mytime[0] !== "00") {
             return duracion + " h";
         } else {

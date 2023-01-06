@@ -5,6 +5,8 @@ import Swal from 'sweetalert2';
 
 import plusicon from '../assets/plus.svg';
 import subicon from '../assets/sub.svg';
+import Global from '../Global';
+import axios from 'axios';
 
 export class Horario extends Component {
     state = {
@@ -15,7 +17,59 @@ export class Horario extends Component {
         sala_actual : 0,
         edit_mode : false
     }
-
+    loadCompanies = () => {
+        var request = "/api/Empresas";
+        var url = Global.url + request;
+        console.log(url, request)
+        axios.get(url).then(res => {
+            console.log(res.data);
+            this.setState({
+                empresas : res.data
+            });
+            console.log("empresas almacenadas");
+        });
+        
+    }
+    loadTimers = () => {
+        var request = "/api/Timers";
+        var url = Global.url + request;
+        console.log(url, request)
+        axios.get(url).then(res => {
+            console.log(res.data);
+            this.setState({
+                temporizadores : res.data
+            });
+            console.log("Timers almacenadas");
+        });
+        
+    }
+    
+    loadRooms = () => {
+        var request = "/api/Timers";
+        var url = Global.url + request;
+        console.log(url, request)
+        axios.get(url).then(res => {
+            console.log(res.data);
+            this.setState({
+                salas : res.data
+            }, () => {
+                this.changeRoom(0);
+            });
+        });
+        
+    }
+    loadTiemposEmpresasSalas = () => {
+        var request = "/api/TiempoEmpresa";
+        var url = Global.url + request;
+        console.log(url, request)
+        axios.get(url).then(res => {
+            console.log(res.data);
+            this.setState({
+                tiempos_empresas_salas : res.data
+            });
+        });
+        
+    }
     componentDidMount = () => {
         this.loadRooms();
         this.loadTimers();
@@ -36,116 +90,6 @@ export class Horario extends Component {
 
         this.setState({
             sala_actual : auxiliar
-        });
-    }
-
-    loadTiemposEmpresasSalas = () => {
-        this.setState({
-            tiempos_empresas_salas : [
-                {
-                    idtimer : 1,
-                    idempresa : 1,
-                    idsala : 1,
-                    idevento : 0
-                },
-            ]
-        });
-    }
-
-    loadCompanies = () => {
-        /*
-            #1 (GIO) TO (ALL)
-            Resumen: Necesito preparar este método para cargar todas las
-                     empresas creadas hasta este momento y almacenarlas
-                     en el array del state. (Después sustituir el array 
-                     de ejemplo por el correcto)
-        */
-        this.setState({
-            empresas : [
-                {
-                    idempresa : 1,
-                    empresa : "Empresa 1",
-                    imagen : ""
-                },
-                {
-                    idempresa : 2,
-                    empresa : "Empresa 2",
-                    imagen : ""
-                },
-                {
-                    idempresa : 3,
-                    empresa : "Empresa 3",
-                    imagen : ""
-                },
-                {
-                    idempresa : 4,
-                    empresa : "Empresa 4",
-                    imagen : ""
-                }
-            ]     
-        });
-    }
-
-    loadRooms = () => {
-        /*
-            #2 (GIO) TO (ALL)
-            Resumen: Necesito preparar este método para cargar todas las
-                     salas creadas hasta este momento y almacenarlas
-                     en el array del state. (Después sustituir el array 
-                     de ejemplo por el correcto)
-        */
-        this.setState({
-            salas : [
-                {
-                    idsala : 1,
-                    sala : "Sala 1"
-                },
-                {
-                    idsala : 2,
-                    sala : "Sala 2"
-                },
-                {
-                    idsala : 3,
-                    sala : "Sala 3"
-                },
-                {
-                    idsala : 4,
-                    sala : "Sala 4"
-                }
-            ]     
-        }, () => {
-            this.changeRoom(0);
-        });
-    }
-
-    loadTimers = () => {
-        /*
-            #3 (GIO) TO (ALL)
-            Resumen: Necesito preparar este método para cargar todos los
-                     temporizadores creados hasta este momento y almacenarlos
-                     en el array del state. (Después eliminar el ejemplo de abajo)
-        */
-        this.setState({
-            temporizadores : [
-                {
-                    idtimer : 1,
-                    inicio : "08:30",
-                    idcategoria : 1, // SUPONGAMOS QUE ES 'WORK'
-                    pausa : false // No necesario
-                },
-                {
-                    idtimer : 2,
-                    inicio : "08:45",
-                    idcategoria : 2, // SUPONGAMOS QUE ES 'BREAK 5MIN'
-                    pausa : false // No necesario
-                },
-                {
-                    idtimer : 3,
-                    inicio : "08:50",
-                    idcategoria : 3, // SUPONGAMOS QUE ES 'LONG BREAK'
-                    pausa : false // No necesario
-                }
-            ]
         });
     }
 
@@ -185,6 +129,7 @@ export class Horario extends Component {
             #7 (GIO) TO (ALL)
             Resumen: Necesito un método que me devuelva el nombre de la categoría
                      asociada al timer pasado por parámetros.
+                     
         */
        return "CATEGORÍA";
     }

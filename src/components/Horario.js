@@ -40,6 +40,9 @@ export class Horario extends Component {
 
     loadTimers = () => {
         this.currentService.getTemporizadores().then((result_temporizadores) => {
+            result_temporizadores.sort(function (a, b) {
+                return a.inicio.substring(a.inicio.length - 8).localeCompare(b.inicio.substring(a.inicio.length - 8));
+            }); // Se han ordenado los timers por hora más temprana -> hora más tarde
             this.setState({
                 temporizadores : result_temporizadores
             });
@@ -51,6 +54,14 @@ export class Horario extends Component {
             this.setState({
                 categorias : result_categorias
             });
+        });
+    }
+
+    loadCompanies = () => {
+        this.currentService.getEmpresas().then((result_empresas) => {
+            this.setState({
+                empresas : result_empresas      
+            });            
         });
     }
 
@@ -71,59 +82,12 @@ export class Horario extends Component {
     }
 
     loadTiemposEmpresasSalas = () => {
-        this.setState({
-            tiempos_empresas_salas : [
-                {
-                    idtimer : 1,
-                    idempresa : 1,
-                    idSala : 1,
-                    idevento : 0
-                },
-            ]
+        this.currentService.getTES().then((result_tes) => {
+            this.setState({
+                tiempos_empresas_salas : result_tes
+            });
         });
     }
-
-    loadCompanies = () => {
-        /*
-            #1 (GIO) TO (ALL)
-            Resumen: Necesito preparar este método para cargar todas las
-                     empresas creadas hasta este momento y almacenarlas
-                     en el array del state. (Después sustituir el array 
-                     de ejemplo por el correcto)
-        */
-        this.setState({
-            empresas : [
-                {
-                    idempresa : 1,
-                    empresa : "Empresa 1",
-                    imagen : ""
-                },
-                {
-                    idempresa : 2,
-                    empresa : "Empresa 2",
-                    imagen : ""
-                },
-                {
-                    idempresa : 3,
-                    empresa : "Empresa 3",
-                    imagen : ""
-                },
-                {
-                    idempresa : 4,
-                    empresa : "Empresa 4",
-                    imagen : ""
-                }
-            ]     
-        });
-    }
-
-    /*
-        #4 (GIO) TO (ALL)
-        Resumen: ¿No se mantiene el orden al cargar los temporizadores verdad? 
-                    Sería más cómodo tener el array ordenado por de más temprano
-                    a más tarde, a través de su 'inicio'. Si es posible, crear otro método
-                    que reordene dicho array.
-    */
     
     getCompany = (idtimer) => {
         /*
@@ -134,33 +98,30 @@ export class Horario extends Component {
                      empresa, debe ser igual a la sala en la que nos encontramos, es
                      decir; debe ser igual al state sala_actual.
         */
-       return "EMPRESA";
+        return "EMPRESA";
     }
 
-    getCategory = (idtimer) => {
-        /*
-            #7 (GIO) TO (ALL)
-            Resumen: Necesito un método que me devuelva el nombre de la categoría
-                     asociada al timer pasado por parámetros.
-        */
-       return "CATEGORÍA";
+    getCategory = (idcat) => {
+        var res = "";
+        if (this.state.categorias) {
+            this.state.categorias.forEach(element => {
+                if (element.idCategoria === idcat) {
+                    res = element.categoria;
+                }
+            });
+        }
+        return res;
     }
 
     checkTimeCompanyRooms = (idtimer) => {
-        /*
-            #8 (GIO) TO (ALL)
-            Resumen: Necesito un método que busque en la tabla 'tiempos_empresas_salas'
-                     un registro cuyo idtimer sea igual al pasado por parámetros y cuyo
-                     idSala sea igual al que hay en la variable this.state.salas[this.state.sala_actual].idSala.
-                     En caso de que dicho registro exista, se devolverá true, de lo contrario
-                     se devolverá false. (Después eliminar el código de abajo, que lo utilizo de prueba)
-        */
         var existe = false;
-        this.state.tiempos_empresas_salas.forEach(element => {
-            if (element.idtimer === idtimer && element.idSala === this.state.salas[this.state.sala_actual].idSala) {
-                existe = true;
-            }
-        });
+        if (this.state.tiempos_empresas_salas) {
+            this.state.tiempos_empresas_salas.forEach(element => {
+                if (element.idTimer === idtimer && element.idSala === this.state.salas[this.state.sala_actual].idSala) {
+                    existe = true;
+                }
+            });
+        }
         return existe;
     }
 
@@ -271,7 +232,7 @@ export class Horario extends Component {
     }
 
     getFinal = (idcat, inicio) => {
-        var res = "sss";
+        var res = "";
         if (this.state.categorias) {
             var inicio_min = this.transformDuration(inicio);
             this.state.categorias.forEach(element => {
@@ -393,7 +354,7 @@ export class Horario extends Component {
                                                 {
                                                     !this.state.edit_mode && (
                                                         <td colSpan={catcolspan} className='schedule_col scroll'>
-                                                            {this.getCategory(tempo.idTemporizador)}
+                                                            {this.getCategory(tempo.idCategoria)}
                                                         </td>    
                                                     )
                                                 }

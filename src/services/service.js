@@ -66,10 +66,10 @@ export default class service {
         });
     }
 
-    deleteSala(idSala) {
-        var url = Global.mainUrl + "api/salas/" + idSala;
+    putSala(idSala, nombreSala) {
+        var url = Global.mainUrl + "api/salas/updatesala/" + idSala + "/" + nombreSala;
         return new Promise(function(resolve) {
-            axios.delete(url).then(response => {
+            axios.put(url).then(response => {
                 resolve(response);
             }).catch((error) => {
                 // Something happened in setting up the request that triggered an Error
@@ -78,10 +78,10 @@ export default class service {
         });
     }
 
-    putSala(idSala, nombreSala) {
-        var url = Global.mainUrl + "api/salas/updatesala/" + idSala + "/" + nombreSala;
+    deleteSala(idSala) {
+        var url = Global.mainUrl + "api/salas/" + idSala;
         return new Promise(function(resolve) {
-            axios.put(url).then(response => {
+            axios.delete(url).then(response => {
                 resolve(response);
             }).catch((error) => {
                 // Something happened in setting up the request that triggered an Error
@@ -102,11 +102,59 @@ export default class service {
         });
     }
 
+    getEmpresas() {
+        var url = Global.mainUrl + "api/empresas";
+        return new Promise(function(resolve) {
+            axios.get(url).then(response => {
+                resolve(response.data);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
     getEmpresa(idempresa) {
         var url = Global.mainUrl + "api/empresas/" + idempresa;
         return new Promise(function(resolve) {
             axios.get(url).then(response => {
                 resolve(response.data);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    postEmpresa(nombreEmpresa) {
+        var url = Global.mainUrl + "api/empresas/createempresa/" + nombreEmpresa;
+        return new Promise(function(resolve) {
+            axios.post(url).then(response => {
+                resolve(response);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    putEmpresa(idEmpresa, nombreEmpresa) {
+        var url = Global.mainUrl + "api/empresas/updateempresa/" + idEmpresa + "/" + nombreEmpresa;
+        return new Promise(function(resolve) {
+            axios.put(url).then(response => {
+                resolve(response);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    deleteEmpresa(idEmpresa) {
+        var url = Global.mainUrl + "api/empresas/" + idEmpresa;
+        return new Promise(function(resolve) {
+            axios.delete(url).then(response => {
+                resolve(response);
             }).catch((error) => {
                 // Something happened in setting up the request that triggered an Error
                 console.log('Error:', error.message);

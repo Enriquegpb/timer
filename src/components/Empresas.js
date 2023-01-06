@@ -2,40 +2,26 @@ import React, { Component } from 'react';
 import plusicon from '../assets/plus.svg';
 
 import Swal from 'sweetalert2';
+import service from '../services/service';
 import './css/Empresas.css';
 
 export class Empresas extends Component {
-
-    componentDidMount = () => {
-        /*
-            #1 (GIO) TO (GUTI/SERGIO) ->
-            Resumen: Prepara el componentDidMount para cargar los nombres de las
-            categorías almacenadas en la BBDD.
-        */
-        this.setState({
-            empresas : [
-                {
-                    idempresa : 1,
-                    empresa : "Empresa 1",
-                    imagen : ""
-                },
-                {
-                    idempresa : 2,
-                    empresa : "Empresa 2",
-                    imagen : ""
-                },
-                {
-                    idempresa : 3,
-                    empresa : "Empresa 3",
-                    imagen : ""
-                },
-            ]
-        });
-    }
-
+    currentService = new service();
 
     state = {
         empresas : []
+    }
+
+    componentDidMount = () => {
+        this.loadCompanies();
+    }
+
+    loadCompanies = () => {
+        this.currentService.getEmpresas().then((result) => {
+            this.setState({
+                empresas : result
+            });
+        })
     }
 
     generateCompany = () => {
@@ -53,7 +39,7 @@ export class Empresas extends Component {
                     var auxiliar = this.state.empresas;
                     var correcto = true;
                     auxiliar.forEach(element => {
-                        if (value.toUpperCase() === element.empresa.toUpperCase()) {
+                        if (value.toUpperCase() === element.nombreEmpresa.toUpperCase()) {
                             correcto = false;       
                         }
                     });
@@ -62,27 +48,20 @@ export class Empresas extends Component {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                /*
-                    #2 (GIO) TO (GUTI/SERGIO) ->
-                    Resumen: Prepara esta zona para agregar la nueva empresa en la BBDD.
-                */
-                var newCompany = {
-                    idempresa : this.state.empresas.length,
-                    empresa : result.value,
-                    imagen : ""
-                }
-
-                var auxiliar = this.state.empresas;
-                    auxiliar.push(newCompany);
-                this.setState({
-                    empresas : auxiliar
+                this.currentService.postEmpresa(result.value).then((result_2) => {
+                    Swal.fire(
+                        'Empresa creada',
+                        'Se ha creado la nueva empresa en la Base de datos\n(code: x' + result_2.status + ")",
+                        'success'
+                    );
+                    this.loadCompanies();
                 });
             }
         });
     }
 
     modifyCompany = (index) => {
-        var currentName = this.state.empresas[index].empresa;
+        var currentName = this.state.empresas[index].nombreEmpresa;
         Swal.fire({
             title: 'Modificar empresa',
             input: 'text',
@@ -103,7 +82,7 @@ export class Empresas extends Component {
                     var correcto = true;
                     if (currentName.toUpperCase() !== value.toUpperCase()) {
                         auxiliar.forEach(element => {
-                            if (value.toUpperCase() === element.empresa.toUpperCase()) {
+                            if (value.toUpperCase() === element.nombreEmpresa.toUpperCase()) {
                                 correcto = false;       
                             }
                         });                        
@@ -112,27 +91,26 @@ export class Empresas extends Component {
                 }
             }
         }).then((result) => {
-            var auxiliar = this.state.empresas;
-            if (result.isConfirmed) {
-                /*
-                    #3 (GIO) TO (GUTI/SERGIO) ->
-                    Resumen: Prepara esta zona para actualizar la empresa en la BBDD.
-                */
-                var newCompany = {
-                    idempresa : this.state.empresas[index].idempresa,
-                    empresa : result.value,
-                    imagen : ""
+            if (result.isConfirmed) { // Modificar empresa
+                if (currentName.toUpperCase() !== result.value.toUpperCase()) {
+                    this.currentService.putEmpresa(this.state.empresas[index].idEmpresa, result.value).then((result_3) => {
+                        Swal.fire(
+                            'Empresa modificada',
+                            'Se ha modificado la empresa en la Base de datos\n(code: x' + result_3.status + ")",
+                            'success'
+                        );
+                        this.loadCompanies();
+                    });
                 }
-
-                auxiliar.fill(newCompany, index, index+1);
-                this.setState({
-                    empresas : auxiliar
-                });
             }
-            if (result.isDenied) {
-                auxiliar.splice(index, 1);
-                this.setState({
-                    empresas : auxiliar
+            if (result.isDenied) { // Eliminar empresa
+                this.currentService.deleteEmpresa(this.state.empresas[index].idEmpresa).then((result_4) => {
+                    Swal.fire(
+                        'Empresa eliminada',
+                        'Se ha eliminado la empresa de la Base de datos\n(code: x' + result_4.status + ")",
+                        'success'
+                    );
+                    this.loadCompanies();
                 });
             }
         });
@@ -144,15 +122,17 @@ export class Empresas extends Component {
                 <h1 className='timer_title'>EMPRESAS</h1>
                 <div className='content_box'>
                     {
-                        this.state.empresas.map((empresa, index) => {
-                            return (
-                                <div className='box_empresa' key={index} onClick={() => this.modifyCompany(index)}>
-                                    <p className='box_empresa_target noselect'>
-                                        {empresa.empresa}
-                                    </p>
-                                </div>
-                            )
-                        })
+                        this.state.empresas && (
+                            this.state.empresas.map((empresa, index) => {
+                                return (
+                                    <div className='box_empresa' key={index} onClick={() => this.modifyCompany(index)}>
+                                        <p className='box_empresa_target noselect'>
+                                            {empresa.nombreEmpresa}
+                                        </p>
+                                    </div>
+                                )
+                            })
+                        )
                     }
                     <div className='box_empresa last_item' onClick={() => this.generateCompany()}>
                         <p className='box_empresa_target noselect'>

@@ -126,10 +126,58 @@ export default class service {
         });
     }
 
+    getCategorias() {
+        var url = Global.mainUrl + "api/categoriastimer";
+        return new Promise(function(resolve) {
+            axios.get(url).then(response => {
+                resolve(response.data);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
     getCategoria(idcategoria) {
         var url = Global.mainUrl + "api/categoriastimer/" + idcategoria;
         return new Promise(function(resolve) {
             axios.get(url).then(response => {
+                resolve(response.data);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    postCategoria = (newCategory) => {
+        var url = Global.mainUrl + "api/categoriastimer";
+        return new Promise(function(resolve) {
+            axios.post(url, newCategory).then(response => {
+                resolve(response);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    putCategoria = (newCategory) => {
+        var url = Global.mainUrl + "api/categoriastimer";
+        return new Promise(function(resolve) {
+            axios.put(url, newCategory).then(response => {
+                resolve(response);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    deleteCategoria(idcategoria) {
+        var url = Global.mainUrl + "api/categoriastimer/" + idcategoria;
+        return new Promise(function(resolve) {
+            axios.delete(url).then(response => {
                 resolve(response.data);
             }).catch((error) => {
                 // Something happened in setting up the request that triggered an Error

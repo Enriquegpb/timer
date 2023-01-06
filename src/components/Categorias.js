@@ -2,37 +2,27 @@ import React, { Component } from 'react';
 import plusicon from '../assets/plus.svg';
 
 import Swal from 'sweetalert2';
+import service from '../services/service';
 import './css/Categorias.css';
 
 export class Categorias extends Component {
-
-    componentDidMount = () => {
-        /*
-            #1 (GIO) TO (GUTI/SERGIO) ->
-            Resumen: Prepara el componentDidMount para cargar los nombres de las
-            categorías almacenadas en la BBDD.
-        */
-        this.setState({
-            categorias : [
-                {
-                    idcategoria : 1,
-                    categoria : "CATEGORÍA 1",
-                    duracion : "00:15"
-                },
-                {
-                    idcategoria : 2,
-                    categoria : "Categoría 2",
-                    duracion : "00:30"
-                }
-            ]
-        });
-    }
-
+    currentService = new service();
 
     state = {
-        categorias : []
+        categorias : null
     }
 
+    componentDidMount = () => {
+        this.loadcategories();
+    }
+
+    loadcategories = () => {
+        this.currentService.getCategorias().then((result) => {
+            this.setState({
+                categorias : result
+            });
+        });
+    }
 
     generateCategories = () => {
         new Swal({
@@ -86,26 +76,49 @@ export class Categorias extends Component {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                /*
-                    #2 (GIO) TO (GUTI/SERGIO) ->
-                    Resumen: Prepara esta zona para agregar la nueva categoría en la BBDD.
-                */
+                var newDuration = this.transformDuration(result.value[1]);
                 var newCategory = {
-                    idcategoria : this.state.categorias.length,
+                    idCategoria : 0,
                     categoria : result.value[0],
-                    duracion : result.value[1]
+                    duracion : newDuration
                 }
-                var auxiliar = this.state.categorias;
-                    auxiliar.push(newCategory);
-                this.setState({
-                    categorias : auxiliar
-                })
+                this.currentService.postCategoria(newCategory).then((result) => {
+                    Swal.fire(
+                        'Categoría creada',
+                        'Se ha creado la nueva categoría en la Base de datos\n(code: x' + result.status + ")",
+                        'success'
+                    );
+                    this.loadcategories();
+                });
             }
         });
     }
 
+    transformDuration = (duration) => { // Pasar de 01:15 a 75 (min - integer)
+        var time = duration.split(":");
+        var hours = Number.parseInt(time[0]);
+        var minutes = Number.parseInt(time[1]);
+        if (hours > 0) {
+            hours = hours * 60;
+        }
+        return hours + minutes;
+    }
+
+    transformMinutes = (duracion, legend) => {
+        if (duracion === 60) {
+            return (legend)? "1h" : "01:00";
+        } else if(duracion < 60) {
+            return (legend)? (duracion + " min") : ("00:" + duracion.toString().padStart(2,0));
+        } else {
+            var hours = Math.floor(duracion / 60);  
+            var minutes = duracion % 60;
+            return (legend)? (hours + " h " + minutes + " min") : (hours.toString().padStart(2,0) + ":" + minutes.toString().padStart(2,0));  
+        }
+    }
+
     modifyCategory = (index) => {
         var currentName = this.state.categorias[index].categoria;
+        var currentDuration = this.state.categorias[index].duracion;
         new Swal({
             title: 'Modificar categoría',
             html:
@@ -117,7 +130,7 @@ export class Categorias extends Component {
                 '<p id="error_2" style="display:none; color:red;">Ya existe una categoría con el mismo nombre</p>' +
                 '</br><label for="swal-input2">Duración</label></br>' +
                 '<input type="time" id="swal-input2" class="swal2-input" value="' + 
-                this.state.categorias[index].duracion + 
+                this.transformMinutes(this.state.categorias[index].duracion, false) + 
                 '" style="margin-top:5px;"/></br>' +
                 '<p id="error_3" style="display:none; color:red; margin-bottom:0;">Tiempo mínimo: 1 minuto</p>',
             focusConfirm: false,
@@ -163,37 +176,34 @@ export class Categorias extends Component {
                 }
             }
         }).then((result) => {
-            var auxiliar = this.state.categorias;
-            if (result.isConfirmed) {
-                /*
-                    #3 (GIO) TO (GUTI/SERGIO) ->
-                    Resumen: Prepara esta zona para actualizar la categoría en la BBDD.
-                */
-                var newCategory = {
-                    categoria : result.value[0],
-                    duracion : result.value[1]
+            if (result.isConfirmed) { // Modificar categoría
+                if (result.value[0].toUpperCase() !== currentName.toUpperCase() || this.transformDuration(result.value[1]) !== currentDuration) {
+                    var newCategory = {
+                        idCategoria : this.state.categorias[index].idCategoria,
+                        categoria : result.value[0],
+                        duracion : this.transformDuration(result.value[1])
+                    }
+                    this.currentService.putCategoria(newCategory).then((result) => {
+                        Swal.fire(
+                            'Categoría modificada',
+                            'Se ha modificado la categoría en la Base de datos\n(code: x' + result.status + ")",
+                            'success'
+                        );
+                        this.loadcategories();
+                    });
                 }
-                    auxiliar.fill(newCategory, index, index+1);
-                this.setState({
-                    categorias : auxiliar
-                })
             }
-            if (result.isDenied) {
-                auxiliar.splice(index, 1);
-                this.setState({
-                    categorias : auxiliar
+            if (result.isDenied) { // Eliminar categoría
+                this.currentService.deleteCategoria(this.state.categorias[index].idCategoria).then((result_2) => {
+                    Swal.fire(
+                        'Categoría eliminada',
+                        'Se ha eliminado la categoría en la Base de datos\n(code: x' + result_2.status + ")",
+                        'success'
+                    );
+                    this.loadcategories();
                 });
             }
         });
-    }
-    
-    getDuration = (duracion) => {
-        var mytime = duracion.split(":");
-        if (mytime[0] !== "00") {
-            return duracion + " h";
-        } else {
-            return mytime[1] + " min";
-        }
     }
 
     render() {
@@ -202,16 +212,18 @@ export class Categorias extends Component {
                 <h1 className='timer_title'>CATEGORÍAS</h1>
                 <div className='content_box'>
                     {
-                        this.state.categorias.map((categoria, index) => {
-                            return (
-                                <div className='box_categoria' key={index} onClick={() => this.modifyCategory(index)}>
-                                    <div className='box_categoria_target_time'>{this.getDuration(categoria.duracion)}</div>
-                                    <div className='box_categoria_target noselect'>
-                                        {categoria.categoria}
+                        this.state.categorias && (
+                            this.state.categorias.map((categoria, index) => {
+                                return (
+                                    <div className='box_categoria' key={index} onClick={() => this.modifyCategory(index)}>
+                                        <div className='box_categoria_target_time'>{this.transformMinutes(categoria.duracion, true)}</div>
+                                        <div className='box_categoria_target noselect'>
+                                            {categoria.categoria}
+                                        </div>
                                     </div>
-                                </div>
-                            )
-                        })
+                                )
+                            })
+                        )
                     }
                     <div className='box_categoria last_item' onClick={() => this.generateCategories()}>
                         <p className='box_categoria_target_plus noselect'>

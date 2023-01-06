@@ -104,7 +104,7 @@ export class Categorias extends Component {
         return hours + minutes;
     }
 
-    transformMinutes = (duracion, legend) => {
+    transformMinutes = (duracion, legend) => { // Pasar de 75 a 01:15 (string)
         if (duracion === 60) {
             return (legend)? "1h" : "01:00";
         } else if(duracion < 60) {

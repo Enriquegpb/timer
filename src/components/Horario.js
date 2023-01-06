@@ -2,13 +2,17 @@ import React, { Component } from 'react';
 import './css/Horario.css';
 
 import Swal from 'sweetalert2';
+import service from '../services/service';
 
 import plusicon from '../assets/plus.svg';
 import subicon from '../assets/sub.svg';
 
 export class Horario extends Component {
+    currentService = new service();
+
     state = {
         temporizadores : null,
+        categorias : null,
         empresas : null,
         tiempos_empresas_salas : null,
         salas : null,
@@ -19,8 +23,35 @@ export class Horario extends Component {
     componentDidMount = () => {
         this.loadRooms();
         this.loadTimers();
+        this.loadCategories();
         this.loadCompanies();
         this.loadTiemposEmpresasSalas();
+    }
+
+    loadRooms = () => {
+        this.currentService.getSalas().then((result_salas) => {
+            this.setState({
+                salas : result_salas     
+            }, () => {
+                this.changeRoom(0);
+            });
+        });
+    }
+
+    loadTimers = () => {
+        this.currentService.getTemporizadores().then((result_temporizadores) => {
+            this.setState({
+                temporizadores : result_temporizadores
+            });
+        });
+    }
+
+    loadCategories = () => {
+        this.currentService.getCategorias().then((result_categorias) => {
+            this.setState({
+                categorias : result_categorias
+            });
+        });
     }
 
     changeRoom = (index) => {
@@ -45,7 +76,7 @@ export class Horario extends Component {
                 {
                     idtimer : 1,
                     idempresa : 1,
-                    idsala : 1,
+                    idSala : 1,
                     idevento : 0
                 },
             ]
@@ -86,69 +117,6 @@ export class Horario extends Component {
         });
     }
 
-    loadRooms = () => {
-        /*
-            #2 (GIO) TO (ALL)
-            Resumen: Necesito preparar este método para cargar todas las
-                     salas creadas hasta este momento y almacenarlas
-                     en el array del state. (Después sustituir el array 
-                     de ejemplo por el correcto)
-        */
-        this.setState({
-            salas : [
-                {
-                    idsala : 1,
-                    sala : "Sala 1"
-                },
-                {
-                    idsala : 2,
-                    sala : "Sala 2"
-                },
-                {
-                    idsala : 3,
-                    sala : "Sala 3"
-                },
-                {
-                    idsala : 4,
-                    sala : "Sala 4"
-                }
-            ]     
-        }, () => {
-            this.changeRoom(0);
-        });
-    }
-
-    loadTimers = () => {
-        /*
-            #3 (GIO) TO (ALL)
-            Resumen: Necesito preparar este método para cargar todos los
-                     temporizadores creados hasta este momento y almacenarlos
-                     en el array del state. (Después eliminar el ejemplo de abajo)
-        */
-        this.setState({
-            temporizadores : [
-                {
-                    idtimer : 1,
-                    inicio : "08:30",
-                    idcategoria : 1, // SUPONGAMOS QUE ES 'WORK'
-                    pausa : false // No necesario
-                },
-                {
-                    idtimer : 2,
-                    inicio : "08:45",
-                    idcategoria : 2, // SUPONGAMOS QUE ES 'BREAK 5MIN'
-                    pausa : false // No necesario
-                },
-                {
-                    idtimer : 3,
-                    inicio : "08:50",
-                    idcategoria : 3, // SUPONGAMOS QUE ES 'LONG BREAK'
-                    pausa : false // No necesario
-                }
-            ]
-        });
-    }
-
     /*
         #4 (GIO) TO (ALL)
         Resumen: ¿No se mantiene el orden al cargar los temporizadores verdad? 
@@ -156,23 +124,12 @@ export class Horario extends Component {
                     a más tarde, a través de su 'inicio'. Si es posible, crear otro método
                     que reordene dicho array.
     */
-
-    getEnd = (idtimer) => {
-        /*
-            #5 (GIO) TO (ALL)
-            Resumen: Necesito un método que calcule la hora de finalización
-                        del timer. Se podría pasar el texto a objeto Time (milisegundos)
-                        añadir la duración (también en milisegundos) y posteriormente
-                        realizar el parse al formato hh:mm inicial.
-        */
-        return "09:45";
-    }
     
     getCompany = (idtimer) => {
         /*
             #6 (GIO) TO (ALL)
             Resumen: Necesito un método que me devuelva el nombre de la empresa
-                     asociada al timer pasado por parámetros. El idsala de la tabla
+                     asociada al timer pasado por parámetros. El idSala de la tabla
                      'tiempos_empresas_salas' de la que sacamos la referencia de la 
                      empresa, debe ser igual a la sala en la que nos encontramos, es
                      decir; debe ser igual al state sala_actual.
@@ -194,13 +151,13 @@ export class Horario extends Component {
             #8 (GIO) TO (ALL)
             Resumen: Necesito un método que busque en la tabla 'tiempos_empresas_salas'
                      un registro cuyo idtimer sea igual al pasado por parámetros y cuyo
-                     idsala sea igual al que hay en la variable this.state.salas[this.state.sala_actual].idsala.
+                     idSala sea igual al que hay en la variable this.state.salas[this.state.sala_actual].idSala.
                      En caso de que dicho registro exista, se devolverá true, de lo contrario
                      se devolverá false. (Después eliminar el código de abajo, que lo utilizo de prueba)
         */
         var existe = false;
         this.state.tiempos_empresas_salas.forEach(element => {
-            if (element.idtimer === idtimer && element.idsala === this.state.salas[this.state.sala_actual].idsala) {
+            if (element.idtimer === idtimer && element.idSala === this.state.salas[this.state.sala_actual].idSala) {
                 existe = true;
             }
         });
@@ -246,9 +203,9 @@ export class Horario extends Component {
         }).then((result) => {
             if (result.isConfirmed) {
                 var newRegister = {
-                    idtimer : this.state.temporizadores[index].idtimer,
+                    idtimer : this.state.temporizadores[index].idTemporizador,
                     idempresa : Number.parseInt(result.value[0]),
-                    idsala : this.state.salas[this.state.sala_actual].idsala,
+                    idSala : this.state.salas[this.state.sala_actual].idSala,
                     idevento : 0
                 }
                 new Swal({
@@ -278,11 +235,11 @@ export class Horario extends Component {
             #9 (GIO) TO (ALL)
             Resumen: Necesito un método que elimine en la tabla 'tiempos_empresas_salas'
                      un registro cuyo idtimer sea igual al pasado por parámetros y cuyo
-                     idsala sea igual al que hay en la variable this.state.salas[this.state.sala_actual].idsala
+                     idSala sea igual al que hay en la variable this.state.salas[this.state.sala_actual].idSala
         */
         var position = -1;
         this.state.tiempos_empresas_salas.forEach((element, index) => {
-            if (element.idtimer === idtimer && element.idsala === this.state.salas[this.state.sala_actual].idsala) {
+            if (element.idtimer === idtimer && element.idSala === this.state.salas[this.state.sala_actual].idSala) {
                 position = index;
             }    
         });
@@ -307,6 +264,48 @@ export class Horario extends Component {
         });
     }
 
+    getInicio = (string_init) => {
+        var time = new Date(string_init);
+        var time_string = time.toTimeString().split(' ')[0];
+        return time_string.substring(0, time_string.length - 3);
+    }
+
+    getFinal = (idcat, inicio) => {
+        var res = "sss";
+        if (this.state.categorias) {
+            var inicio_min = this.transformDuration(inicio);
+            this.state.categorias.forEach(element => {
+                if (element.idCategoria === idcat) {
+                    inicio_min += element.duracion;
+                    res = this.transformMinutes(inicio_min);
+                }
+            });
+        }
+        return res;
+    }
+
+    transformDuration = (duration) => { // Pasar de 01:15 a 75 (min - integer)
+        var time = duration.split(":");
+        var hours = Number.parseInt(time[0]);
+        var minutes = Number.parseInt(time[1]);
+        if (hours > 0) {
+            hours = hours * 60;
+        }
+        return hours + minutes;
+    }
+
+    transformMinutes = (duracion, legend) => { // Pasar de 75 a 01:15 (string)
+        if (duracion === 60) {
+            return (legend)? "1h" : "01:00";
+        } else if(duracion < 60) {
+            return (legend)? (duracion + " min") : ("00:" + duracion.toString().padStart(2,0));
+        } else {
+            var hours = Math.floor(duracion / 60);  
+            var minutes = duracion % 60;
+            return (legend)? (hours + " h " + minutes + " min") : (hours.toString().padStart(2,0) + ":" + minutes.toString().padStart(2,0));  
+        }
+    }
+
     render() {
         return (
             <div>
@@ -327,7 +326,7 @@ export class Horario extends Component {
                                     </button>
                                     {
                                         this.state.sala_actual >= 0 && this.state.salas && (
-                                            this.state.salas[this.state.sala_actual].sala
+                                            this.state.salas[this.state.sala_actual].nombreSala
                                         )
                                     }
                                     <button className='schedule_buttons_rooms' onClick={() => this.changeRoom(1)}>
@@ -342,23 +341,24 @@ export class Horario extends Component {
                             {
                                 this.state.temporizadores && this.state.salas && (
                                     this.state.temporizadores.map((tempo, index) => {
-                                        var check = this.checkTimeCompanyRooms(tempo.idtimer);
+                                        var check = this.checkTimeCompanyRooms(tempo.idTemporizador);
                                         var catcolspan = check ? 1 : 2;
+                                        var inicio = this.getInicio(tempo.inicio);
                                         return (
                                             <tr key={index}>
-                                                <td>{tempo.inicio}<br/>{this.getEnd(tempo.idtimer)}</td>
+                                                <td>{inicio}<br/>{this.getFinal(tempo.idCategoria, inicio)}</td>
                                                 {
                                                     this.state.edit_mode ? (
                                                         <td className='schedule_col scroll' colSpan={2}>
                                                             {
                                                                 check ? (
                                                                     <div className='company_edit_box'>
-                                                                        <button className='company_edit_box_target_sub' onClick={() => this.deleteTimer(tempo.idtimer)}>
+                                                                        <button className='company_edit_box_target_sub' onClick={() => this.deleteTimer(tempo.idTemporizador)}>
                                                                             <img src={subicon} className="addsub_icon" alt="Icono restar"/>
                                                                         </button>
                                                                         <div className='company_edit_box_target scroll'>
                                                                             <p className="target_text">
-                                                                                {this.getCompany(tempo.idtimer)}
+                                                                                {this.getCompany(tempo.idTemporizador)}
                                                                             </p>
                                                                         </div>
                                                                         <div className='inactive'>
@@ -385,7 +385,7 @@ export class Horario extends Component {
                                                     ) : (
                                                         check && (
                                                             <td className='schedule_col scroll'>
-                                                                {this.getCompany(tempo.idtimer)}
+                                                                {this.getCompany(tempo.idTemporizador)}
                                                             </td>
                                                         )
                                                     )
@@ -393,7 +393,7 @@ export class Horario extends Component {
                                                 {
                                                     !this.state.edit_mode && (
                                                         <td colSpan={catcolspan} className='schedule_col scroll'>
-                                                            {this.getCategory(tempo.idtimer)}
+                                                            {this.getCategory(tempo.idTemporizador)}
                                                         </td>    
                                                     )
                                                 }

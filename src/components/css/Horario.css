@@ -33,11 +33,11 @@ tr:last-child td:last-child {
 
 .schedule_header {
     font-size: 25px;
-    font-family: Nexa;
+    font-family: Share;
 }
 
 .schedule_header > th:first-child {
-    min-width: 1em;
+    width: 3em;
 }
 
 .schedule_buttons_rooms {

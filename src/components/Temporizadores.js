@@ -86,22 +86,20 @@ export class Temporizadores extends Component {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                console.log(result);
-                /*
-                    #3 (GIO) TO (GUTI/SERGIO) ->
-                    Resumen: Prepara esta zona para agregar el nuevo temporizador en la BBDD.
-                */
                 var newTimer = {
-                    idTemporizador : 1000, // Entiendo que todos los id son autogenerados????
-                    inicio : result.value[0],
+                    idTemporizador : 0,
+                    inicio : "2023-01-18T" + result.value[0] +":00",
                     idCategoria : result.value[1],
-                    pausa : false // No necesario
+                    pausa : false
                 }
-                var auxiliar = this.state.temporizadores;
-                    auxiliar.push(newTimer);
-                this.setState({
-                    temporizadores : auxiliar
-                })
+                this.currentService.postTemporizador(newTimer).then((result_post_timer) => {
+                    Swal.fire(
+                        'Temporizador creado',
+                        'Se ha creado el nuevo temporizador en la Base de datos\n(code: x' + result_post_timer.status + ")",
+                        'success'
+                    );
+                    this.loadTimers();
+                });
             }
         });
     }
@@ -113,7 +111,7 @@ export class Temporizadores extends Component {
                 html:
                     '<label for="swal-input1">Hora de inicio</label></br>' +
                     '<input type="time" id="swal-input1" class="swal2-input" style="margin-top:5px;" value="' + 
-                    this.state.temporizadores[index].inicio + 
+                    this.getInicio(this.state.temporizadores[index].inicio) + 
                     '"/></br>' +
                     '<p id="error_1" style="display:none; color:red;">Por favor, inserte una hora válida</p></br>' +
                     '<label for="swal-input2">Categoría</label></br>' +
@@ -121,9 +119,12 @@ export class Temporizadores extends Component {
                     this.getOptionsCategories(this.state.temporizadores[index].idCategoria) + 
                     '</select>',
                 focusConfirm: false,
+                showDenyButton: true,
                 showCancelButton: true,
-                confirmButtonText: "Aceptar",
-                confirmButtonColor: '#2C4D9E',
+                confirmButtonText: "Guardar temporizador",
+                confirmButtonColor: "#2C4D9E",
+                denyButtonText: "Eliminar temporizador",
+                denyButtonColor: "#FF0000",
                 cancelButtonText: "Cancelar",
                 preConfirm: () => {
                     if (document.getElementById('swal-input1').value === "") {
@@ -137,24 +138,31 @@ export class Temporizadores extends Component {
                     }
                 }
             }).then((result) => {
-                if (result.isConfirmed) {
-                    /*
-                        #4 (GIO) TO (GUTI/SERGIO) ->
-                        Resumen: Prepara esta zona para agregar el temporizador modificado en la BBDD.
-                    */
+                if (result.isConfirmed) { // Modificar temporizador
                     var newTimer = {
-                        idTemporizador : 1000, // Se le pasa su propio ID o da igual????
-                        inicio : result.value[0],
-                        idCategoria : Number.parseInt(result.value[1]),
-                        pausa : false // No necesario
+                        idTemporizador : this.state.temporizadores[index].idTemporizador,
+                        inicio : "2023-01-18T" + result.value[0] +":00",
+                        idCategoria : result.value[1],
+                        pausa : false
                     }
-                    var auxiliar = this.state.temporizadores;
-                        auxiliar.fill(newTimer, index, index+1);
-                    this.setState({
-                        temporizadores : auxiliar
-                    }, () => {
-                        // console.log(JSON.stringify(this.state.temporizadores));
-                    })
+                    this.currentService.putTemporizador(newTimer).then((result_put_timer) => {
+                        Swal.fire(
+                            'Temporizador modificado',
+                            'Se ha modificado el temporizador de la Base de datos\n(code: x' + result_put_timer.status + ")",
+                            'success'
+                        );
+                        this.loadTimers();
+                    });
+                }
+                if (result.isDenied) { // Eliminar temporizador
+                    this.currentService.deleteTemporizador(this.state.temporizadores[index].idTemporizador).then((result_put_timer) => {
+                        Swal.fire(
+                            'Temporizador eliminado',
+                            'Se ha eliminado el temporizador de la Base de datos\n(code: x' + result_put_timer.status + ")",
+                            'success'
+                        );
+                        this.loadTimers();
+                    });
                 }
             });
         }

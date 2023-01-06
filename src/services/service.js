@@ -198,6 +198,42 @@ export default class service {
         });
     }
 
+    postTemporizador(newTimer) {
+        var url = Global.mainUrl + "api/timers";
+        return new Promise(function(resolve) {
+            axios.post(url, newTimer).then(response => {
+                resolve(response);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    putTemporizador(newTimer) {
+        var url = Global.mainUrl + "api/timers";
+        return new Promise(function(resolve) {
+            axios.put(url, newTimer).then(response => {
+                resolve(response);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    deleteTemporizador(idTimer) {
+        var url = Global.mainUrl + "api/timers/" + idTimer;
+        return new Promise(function(resolve) {
+            axios.delete(url).then(response => {
+                resolve(response);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
     getCategorias() {
         var url = Global.mainUrl + "api/categoriastimer";
         return new Promise(function(resolve) {

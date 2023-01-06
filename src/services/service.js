@@ -286,7 +286,7 @@ export default class service {
         var url = Global.mainUrl + "api/categoriastimer/" + idcategoria;
         return new Promise(function(resolve) {
             axios.delete(url).then(response => {
-                resolve(response.data);
+                resolve(response);
             }).catch((error) => {
                 // Something happened in setting up the request that triggered an Error
                 console.log('Error:', error.message);

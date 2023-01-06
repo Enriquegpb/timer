@@ -314,7 +314,7 @@ export class Horario extends Component {
             <div>
                 <h1 className='timer_title noselect'>HORARIO</h1>
                 {
-                    this.state.toke && (
+                    this.state.token && (
                         <button id="button_edit_schedule" className='button_edit_schedule' onClick={() => this.changeMode()}>
                             Editar empresas
                         </button>

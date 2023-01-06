@@ -2,10 +2,12 @@ import React, { Component } from 'react';
 import './css/Salas.css';
 
 import Swal from 'sweetalert2';
+import service from '../services/service';
 
 import plusicon from '../assets/plus.svg';
 
 export class Salas extends Component {
+    currentService = new service();
     state = {
         salas : []
     }
@@ -15,22 +17,10 @@ export class Salas extends Component {
     }
 
     loadRooms = () => {
-        /*
-            #1 (GIO) TO (SERGIO) ->
-            Resumen: Prepara el método para cargar las
-            salas almacenadas en la BBDD.
-        */
-        this.setState({
-            salas : [
-                {
-                    idsala : 1,
-                    sala : "Sala 1"
-                },
-                {
-                    idsala : 2,
-                    sala : "Sala 2"
-                },
-            ]
+        this.currentService.getSalas().then((result) => {
+            this.setState({
+                salas : result
+            });
         });
     }
 
@@ -50,7 +40,7 @@ export class Salas extends Component {
                     var auxiliar = this.state.salas;
                     var correcto = true;
                     auxiliar.forEach(element => {
-                        if (value.toUpperCase() === element.sala.toUpperCase()) {
+                        if (value.toUpperCase() === element.nombreSala.toUpperCase()) {
                             correcto = false;       
                         }
                     });
@@ -59,26 +49,20 @@ export class Salas extends Component {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                /*
-                    #2 (GIO) TO (SERGIO) ->
-                    Resumen: Prepara esta zona para agregar la nueva sala en la BBDD.
-                */
-                var newRoom = {
-                    idsala : this.state.salas,
-                    sala : result.value
-                }
-
-                var auxiliar = this.state.salas;
-                    auxiliar.push(newRoom);
-                this.setState({
-                    salas : auxiliar
+                this.currentService.postSala(result.value).then(result_2 => {
+                    Swal.fire(
+                        'Sala creada',
+                        'Se ha creado la nueva sala en la Base de datos\n(code: x' + result_2.status + ")",
+                        'success'
+                    );
+                    this.loadRooms();
                 });
             }
         });
     }
 
     modifyRoom = (index) => {
-        var currentName = this.state.salas[index].sala;
+        var currentName = this.state.salas[index].nombreSala;
         Swal.fire({
             title: 'Modificar sala',
             input: 'text',
@@ -99,7 +83,7 @@ export class Salas extends Component {
                     var correcto = true;
                     if (currentName.toUpperCase() !== value.toUpperCase()) {
                         auxiliar.forEach(element => {
-                            if (value.toUpperCase() === element.sala.toUpperCase()) {
+                            if (value.toUpperCase() === element.nombreSala.toUpperCase()) {
                                 correcto = false;       
                             }
                         });                        
@@ -108,27 +92,25 @@ export class Salas extends Component {
                 }
             }
         }).then((result) => {
-            var auxiliar = this.state.salas;
-            if (result.isConfirmed) {
-                /*
-                    #3 (GIO) TO (SERGIO) ->
-                    Resumen: Prepara esta zona para actualizar la sala en la BBDD.
-                */
-                var newRoom = {
-                    idsala : this.state.salas[index].idsala,
-                    sala : result.value
-                }
-
-                auxiliar.fill(newRoom, index, index+1);
-                this.setState({
-                    salas : auxiliar
+            if (result.isConfirmed) { // Modificación de la sala
+                this.currentService.putSala(this.state.salas[index].idSala, result.value).then(result_3 => {
+                    Swal.fire(
+                        'Sala modificada',
+                        'Se ha modificado la sala en la Base de datos\n(code: x' + result_3.status + ")",
+                        'success'
+                    );
+                    this.loadRooms();
                 });
             }
-            if (result.isDenied) {
-                    auxiliar.splice(index, 1);
-                this.setState({
-                    salas : auxiliar
-                });
+            if (result.isDenied) { // Eliminación de la sala 
+                this.currentService.deleteSala(this.state.salas[index].idSala).then(result_4 => {
+                    Swal.fire(
+                        'Sala eliminada',
+                        'Se ha eliminado la sala de la Base de datos\n(code: x' + result_4.status + ")",
+                        'success'
+                    );
+                    this.loadRooms();
+                })
             }
         });
     }
@@ -141,9 +123,9 @@ export class Salas extends Component {
                     {
                         this.state.salas.map((sala, index) => {
                             return (
-                                <div className='box_sala' key={index} onClick={() => this.modifyRoom(index)}>
+                                <div className='box_sala scroll' key={index} onClick={() => this.modifyRoom(index)}>
                                     <p className='box_sala_target noselect'>
-                                        {sala.sala}
+                                        {sala.nombreSala}
                                     </p>
                                 </div>
                             )

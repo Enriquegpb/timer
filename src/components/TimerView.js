@@ -152,7 +152,7 @@ export class TimerView extends Component {
                             )
                         }
                 </header>
-                <div className='maincircle mainshadow shadowcircle' onClick={() => this.getNextTimers()}>
+                <div className='maincircle mainshadow shadowcircle'>
                     <span className='valuecircle noselect'>
                         {/* 
                             #1 (GIO) TO (GUTI/SERGIO) ->

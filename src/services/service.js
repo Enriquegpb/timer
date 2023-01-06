@@ -19,7 +19,7 @@ export default class service {
                         'Acceso denegado',
                         'Credenciales incorrectas',
                         'error'
-                      )
+                    );
                     // The request was made and the server responded with a status code that falls out of the range of 2xx
                     // console.log(error.response.data);
                 } else {
@@ -47,6 +47,42 @@ export default class service {
         return new Promise(function(resolve) {
             axios.get(url).then(response => {
                 resolve(response.data);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    postSala(nombreSala) {
+        var url = Global.mainUrl + "api/salas/createsala/" + nombreSala;
+        return new Promise(function(resolve) {
+            axios.post(url).then(response => {
+                resolve(response);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    deleteSala(idSala) {
+        var url = Global.mainUrl + "api/salas/" + idSala;
+        return new Promise(function(resolve) {
+            axios.delete(url).then(response => {
+                resolve(response);
+            }).catch((error) => {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error:', error.message);
+            });
+        });
+    }
+
+    putSala(idSala, nombreSala) {
+        var url = Global.mainUrl + "api/salas/updatesala/" + idSala + "/" + nombreSala;
+        return new Promise(function(resolve) {
+            axios.put(url).then(response => {
+                resolve(response);
             }).catch((error) => {
                 // Something happened in setting up the request that triggered an Error
                 console.log('Error:', error.message);

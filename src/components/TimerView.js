@@ -3,11 +3,17 @@ import './css/TimerView.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle';
 
+import Global from '../Global';
 import service from '../services/service';
+import io from "socket.io-client";
 
 /* SUBCOMPONENTES */
 import SalaPopUp from './SalaPopUp';
 import Tiempo from './Tiempo';
+
+const socket = io(Global.SocketUrl, {
+    withCredentials: true,
+});
 
 export class TimerView extends Component {
     currentService = new service();
@@ -25,14 +31,41 @@ export class TimerView extends Component {
         next_c2 : "",
         next_e2 : "",
         statusSalaPopUp : false, // Almacena la aparición o no del PopUp de selección de sala
-        checkCompany : false
+        checkCompany : false,
+        guti : null
     }
 
     componentDidMount = () => {
         this.currentService.getSalas().then((result) => {
             this.changeRoom(result[0].nombreSala, result[0].idSala);
         }); // Cargamos el nombre de la primera sala habilitada
-        this.getNextTimers();
+
+        this.currentService.getTemporizadores().then((result) => {
+            this.setState({
+                guti : result
+            });
+        });
+        
+        socket.on('timerID', (idTimer) => {
+            this.setState({
+                timer_id : idTimer
+            }, () => {
+                this.setState({
+                    next_timers : this.ordenarTimers(this.state.guti)
+                }, () => {
+                    if (this.state.next_timers.length > 0) {
+                        this.getCategoryName(this.state.next_timers[0].idCategoria, true);
+                        this.getLineName(this.state.next_timers[0].idTemporizador, true);                        
+                    }
+
+                    if (this.state.next_timers.length > 1) {
+                        this.getCategoryName(this.state.next_timers[1].idCategoria, false);
+                        this.getLineName(this.state.next_timers[1].idTemporizador, false);                        
+                    }
+                    this.checkCompany();
+                });
+            });
+        });
     }
 
     changeStatusSalaPopUp = () => {
@@ -45,9 +78,6 @@ export class TimerView extends Component {
         this.setState({
             sala_id : id,
             sala_nombre : name
-        }, () => {
-            this.checkCompany();
-            this.getNextTimers();
         });
     }
 
@@ -69,30 +99,22 @@ export class TimerView extends Component {
         });
     }
 
-    getNextTimers = () => {
-        var correct_position = -1;
-        var nextTimers = [];
-        this.currentService.getTemporizadores().then((result) => {
-            result.sort(function (a, b) {
-                return a.inicio.substring(a.inicio.length - 8).localeCompare(b.inicio.substring(a.inicio.length - 8));
-            }); // Se han ordenado los timers por hora más temprana -> hora más tarde
-            result.forEach((element, index) => {
-                if (new Date(element.inicio).getTime() > new Date().getTime() && correct_position === -1) {
-                    correct_position = index;
-                }
-            });
-            nextTimers.push(result[correct_position]);
-            nextTimers.push(result[correct_position+1]);
-        }).then(() => {
-            this.setState({
-                next_timers : nextTimers
-            }, () => {
-                this.getCategoryName(this.state.next_timers[0].idCategoria, true);
-                this.getCategoryName(this.state.next_timers[1].idCategoria, false);
-                this.getLineName(this.state.next_timers[0].idTemporizador, true);
-                this.getLineName(this.state.next_timers[1].idTemporizador, false);
-            });
+    ordenarTimers(timers) {
+        // First, filter out any timer objects that are in the past
+        const currentDate = new Date();
+        const filteredTimers = timers.filter(timer => {
+          const startTime = new Date(timer.inicio);
+          return startTime >= currentDate;
         });
+      
+        // Then, sort the remaining timer objects by start time
+        const sortedTimers = filteredTimers.sort((a, b) => {
+          const startTimeA = new Date(a.inicio);
+          const startTimeB = new Date(b.inicio);
+          return startTimeA - startTimeB;
+        });
+      
+        return sortedTimers;
     }
 
     getCompanyName = () => {
@@ -159,16 +181,27 @@ export class TimerView extends Component {
                     </span>
                 </div>
                 {
-                    this.state.next_timers.length > 0 && (
+                    this.state.next_timers.length > 0 ? (
                         <footer className='noselect'>
                             <b>Siguiente:</b>
                             <p>
                                 <i>{this.state.next_e1}</i> ({this.state.next_c1}) 
                                  - {this.state.next_timers[0].inicio.substring(this.state.next_timers[0].inicio.length - 8)}
                             </p>
+                            {
+                                this.state.next_timers.length > 1 && (
+                                    <p>
+                                        <i>{this.state.next_e2}</i> ({this.state.next_c2})
+                                        - {this.state.next_timers[1].inicio.substring(this.state.next_timers[1].inicio.length - 8)}
+                                    </p>
+                                )
+                            }
+                        </footer>
+                    ) : (
+                        <footer className='noselect'>
+                            <b>Siguiente:</b>
                             <p>
-                                <i>{this.state.next_e2}</i> ({this.state.next_c2})
-                                 - {this.state.next_timers[1].inicio.substring(this.state.next_timers[1].inicio.length - 8)}
+                                <i>No existen más temporizadores registrados</i>
                             </p>
                         </footer>
                     )

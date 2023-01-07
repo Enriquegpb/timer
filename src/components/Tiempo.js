@@ -15,14 +15,14 @@ function App() {
         socket.on('envio', (num) => {
             const min = Math.floor(num / 60);
             const sec = num % 60;
-            setNumero(`${min}:${sec < 10 ? '0' : ''}${sec}`)
+            setNumero(`${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`)
         });
     });
 
     socket.on('envio', (num) => {
     const min = Math.floor(num / 60);
         const sec = num % 60;
-        setNumero(`${min}:${sec < 10 ? '0' : ''}${sec}`)
+        setNumero(`${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`)
     });
 
     return (

@@ -1,6 +1,6 @@
 .schedule_table_box {
     width: 90vw;
-    margin: auto;
+    margin: auto auto 50px auto;
 }
 
 .schedule_table {
@@ -31,6 +31,17 @@ tr:last-child td:last-child {
     border-bottom-right-radius: 10px; 
 }
 
+#theader_schedule {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 1fr 6fr 1fr;
+}
+
+#theader_schedule_p {
+    margin: 0;
+    font-size: 22px;
+}
+
 .schedule_header {
     font-size: 25px;
     font-family: Share;
@@ -46,6 +57,10 @@ tr:last-child td:last-child {
     padding: 12px;
     margin: 0 10px;
     display: inline-flex;
+}
+
+.schedule_buttons_rooms > svg {
+    margin: auto;
 }
 
 .schedule_col {

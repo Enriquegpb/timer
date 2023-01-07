@@ -29,12 +29,15 @@ form {
 
 .button_superuser {
     margin: auto;
+    width: 90%;
+    text-align: center;
     padding: 10px 15px;
     border: 0;
     border-radius: 25px;
     box-shadow: 0 4px 0 1px rgb(192, 192, 192);
-    background-color: orange;
+    background-color: rgb(96, 149, 180);
     color: white;
+    font-weight: bold;
     text-decoration: none;
 }
 

@@ -53,10 +53,10 @@ export class Salas extends Component {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                this.currentService.postSala(result.value).then(result_2 => {
+                this.currentService.postSala(result.value).then(() => {
                     Swal.fire(
                         'Sala creada',
-                        'Se ha creado la nueva sala en la Base de datos\n(code: x' + result_2.status + ")",
+                        'Se ha creado la nueva sala en la base de datos',
                         'success'
                     );
                     this.loadRooms();
@@ -99,25 +99,50 @@ export class Salas extends Component {
             }).then((result) => {
                 if (result.isConfirmed) { // Modificación de la sala
                     if (currentName.toUpperCase() !== result.value.toUpperCase()) {
-                        this.currentService.putSala(this.state.salas[index].idSala, result.value).then(result_3 => {
+                        this.currentService.putSala(this.state.salas[index].idSala, result.value).then(() => {
                             Swal.fire(
                                 'Sala modificada',
-                                'Se ha modificado la sala en la Base de datos\n(code: x' + result_3.status + ")",
+                                'Se ha modificado la sala en la Base de datos',
                                 'success'
                             );
                             this.loadRooms();
                         });
                     }
                 }
-                if (result.isDenied) { // Eliminación de la sala 
-                    this.currentService.deleteSala(this.state.salas[index].idSala).then(result_4 => {
-                        Swal.fire(
-                            'Sala eliminada',
-                            'Se ha eliminado la sala de la Base de datos\n(code: x' + result_4.status + ")",
-                            'success'
-                        );
-                        this.loadRooms();
-                    })
+                if (result.isDenied) { // Eliminación de la sala
+                    Swal.fire({
+                        title: '¿Estás segur@?',
+                        text: "Al eliminar esta sala también se eliminarán los registros de empresas asignadas al misma",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#2C4D9E',
+                        cancelButtonColor: '#FF0000',
+                        confirmButtonText: 'Sí, estoy segur@',
+                        cancelButtonText: 'No, cancelar'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                            var currentID = this.state.salas[index].idSala;
+                            this.currentService.getTES().then((result_tes) => {
+                                var counter = 0;
+                                result_tes.forEach(registro => {
+                                    counter ++;
+                                    if (registro.idSala === currentID) {
+                                        this.currentService.deleteTES(registro.id);
+                                    }
+                                    if (counter === result_tes.length) {
+                                        this.currentService.deleteSala(currentID).then(() => {
+                                            Swal.fire(
+                                                'Sala eliminada',
+                                                'Se ha eliminado la sala de la base de datos',
+                                                'success'
+                                            );
+                                            this.loadRooms();
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    });
                 }
             });  
         }

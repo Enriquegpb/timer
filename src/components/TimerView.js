@@ -7,6 +7,7 @@ import service from '../services/service';
 
 /* SUBCOMPONENTES */
 import SalaPopUp from './SalaPopUp';
+import Tiempo from './Tiempo';
 
 export class TimerView extends Component {
     currentService = new service();
@@ -154,12 +155,7 @@ export class TimerView extends Component {
                 </header>
                 <div className='maincircle mainshadow shadowcircle'>
                     <span className='valuecircle noselect'>
-                        {/* 
-                            #1 (GIO) TO (GUTI/SERGIO) ->
-                            Resumen: NECESITO UN DIV CON EL VALOR DE TIEMPO (mm:ss) 
-                            Ejemplo: <div>15:27</div>
-                        */}
-                        15:27
+                        <Tiempo/>
                     </span>
                 </div>
                 {

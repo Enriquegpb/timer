@@ -45,9 +45,9 @@
     font-family: Nexa;
 }
 
-.menutag > span {
+.menutag > div {
     display: inline-block;
-    width: 80px;
+    width: 50px;
     text-align: left;
 }
 

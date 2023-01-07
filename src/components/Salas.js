@@ -53,10 +53,10 @@ export class Salas extends Component {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                this.currentService.postSala(result.value).then(result_2 => {
+                this.currentService.postSala(result.value).then(() => {
                     Swal.fire(
                         'Sala creada',
-                        'Se ha creado la nueva sala en la Base de datos\n(code: x' + result_2.status + ")",
+                        'Se ha creado la nueva sala en la base de datos',
                         'success'
                     );
                     this.loadRooms();
@@ -99,10 +99,10 @@ export class Salas extends Component {
             }).then((result) => {
                 if (result.isConfirmed) { // Modificación de la sala
                     if (currentName.toUpperCase() !== result.value.toUpperCase()) {
-                        this.currentService.putSala(this.state.salas[index].idSala, result.value).then(result_3 => {
+                        this.currentService.putSala(this.state.salas[index].idSala, result.value).then(() => {
                             Swal.fire(
                                 'Sala modificada',
-                                'Se ha modificado la sala en la Base de datos\n(code: x' + result_3.status + ")",
+                                'Se ha modificado la sala en la Base de datos',
                                 'success'
                             );
                             this.loadRooms();

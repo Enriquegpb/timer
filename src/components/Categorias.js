@@ -86,10 +86,10 @@ export class Categorias extends Component {
                     categoria : result.value[0],
                     duracion : newDuration
                 }
-                this.currentService.postCategoria(newCategory).then((result) => {
+                this.currentService.postCategoria(newCategory).then(() => {
                     Swal.fire(
                         'Categoría creada',
-                        'Se ha creado la nueva categoría en la Base de datos\n(code: x' + result.status + ")",
+                        'Se ha creado la nueva categoría en la base de datos',
                         'success'
                     );
                     this.loadcategories();
@@ -188,10 +188,10 @@ export class Categorias extends Component {
                             categoria : result.value[0],
                             duracion : this.transformDuration(result.value[1])
                         }
-                        this.currentService.putCategoria(newCategory).then((result) => {
+                        this.currentService.putCategoria(newCategory).then(() => {
                             Swal.fire(
                                 'Categoría modificada',
-                                'Se ha modificado la categoría en la Base de datos\n(code: x' + result.status + ")",
+                                'Se ha modificado la categoría en la base de datos',
                                 'success'
                             );
                             this.loadcategories();
@@ -199,14 +199,53 @@ export class Categorias extends Component {
                     }
                 }
                 if (result.isDenied) { // Eliminar categoría
-                    this.currentService.deleteCategoria(this.state.categorias[index].idCategoria).then((result_2) => {
-                        Swal.fire(
-                            'Categoría eliminada',
-                            'Se ha eliminado la categoría en la Base de datos\n(code: x' + result_2.status + ")",
-                            'success'
-                        );
-                        this.loadcategories();
+                    Swal.fire({
+                        title: '¿Estás segur@?',
+                        text: "Al eliminar esta categoría también se eliminarán los temporizadores con dicha categoría asignada",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#2C4D9E',
+                        cancelButtonColor: '#FF0000',
+                        confirmButtonText: 'Sí, estoy segur@',
+                        cancelButtonText: 'No, cancelar'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                            var currentIDCategory = this.state.categorias[index].idCategoria;
+                            this.currentService.getTemporizadores().then((result_timers) => {
+                                var counter_timers = 0;
+                                result_timers.forEach(timer => {
+                                    counter_timers ++;
+                                    if (timer.idCategoria === currentIDCategory) { // Timer con la categoría asignada encontrado
+                                        this.currentService.getTES().then((result_tes) => { // Obtengo los registros de los TES asociados
+                                            var counter_tes = 0;
+                                            result_tes.forEach(registro => { // Recorro los registros de los TES asociados
+                                                counter_tes ++;
+                                                if (registro.idTimer === timer.idTemporizador) {
+                                                    this.currentService.deleteTES(registro.id);
+                                                }
+                                                if (counter_tes === result_tes.length) {
+                                                    this.currentService.deleteTemporizador(timer.idTemporizador);
+                                                }
+                                            });
+                                        });
+                                    }
+                                    if (counter_timers === result_timers.length) {
+                                        this.currentService.deleteCategoria(currentIDCategory).then(() => {
+                                            Swal.fire(
+                                                'Categoría eliminada',
+                                                'Se ha eliminado la categoría en la base de datos',
+                                                'success'
+                                            );
+                                            this.loadcategories();
+                                        });
+                                    }
+                                });
+                            });
+
+                           
+                        }
                     });
+
                 }
             });
         }

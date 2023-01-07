@@ -24,6 +24,7 @@
     justify-content: space-around;
     gap: 10px;
     flex-wrap: wrap;
+    margin-bottom: 50px;
 }
 
 .box_sala {

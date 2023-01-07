@@ -1,6 +1,6 @@
 .schedule_table_box {
     width: 90vw;
-    margin: auto;
+    margin: auto auto 50px auto;
 }
 
 .schedule_table {
@@ -37,8 +37,9 @@ tr:last-child td:last-child {
     grid-template-columns: 1fr 6fr 1fr;
 }
 
-#theader_schedule > p {
+#theader_schedule_p {
     margin: 0;
+    font-size: 22px;
 }
 
 .schedule_header {

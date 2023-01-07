@@ -88,18 +88,53 @@ export class Temporizadores extends Component {
             if (result.isConfirmed) {
                 var newTimer = {
                     idTemporizador : 0,
-                    inicio : "2023-01-18T" + result.value[0] +":00",
+                    inicio : "2023-01-07T" + result.value[0] +":00",
                     idCategoria : result.value[1],
                     pausa : false
                 }
-                this.currentService.postTemporizador(newTimer).then(() => {
-                    Swal.fire(
-                        'Temporizador creado',
-                        'Se ha creado el nuevo temporizador en la base de datos',
-                        'success'
-                    );
-                    this.loadTimers();
-                });
+                var counter = 0, correcto = true;
+                var tcompare_init = this.transformDuration(this.getInicio(newTimer.inicio));
+                var tcompare_end = this.transformDuration(this.getFinal(Number.parseInt(newTimer.idCategoria), newTimer.inicio));
+                if (this.state.temporizadores.length === 0) {
+                    this.currentService.postTemporizador(newTimer).then(() => {
+                        Swal.fire(
+                            'Temporizador creado',
+                            'Se ha creado el nuevo temporizador en la base de datos',
+                            'success'
+                        );
+                        this.loadTimers();
+                    }); 
+                } else {
+                    this.state.temporizadores.forEach((tempo) => {
+                        counter ++; // Esta variable avisará a la función asyn. para que se ejecute cuando termine el forEach
+                        var init = this.transformDuration(this.getInicio(tempo.inicio));                    // Inicio en int
+                        var end = this.transformDuration(this.getFinal(tempo.idCategoria, tempo.inicio));   // Final en int
+    
+                        // CASOS NO COMPATIBLES ================================================================
+                        if (tcompare_init === init) { correcto = false; }                        // Mismo inicio
+                        if (tcompare_init > init && tcompare_init < end) { correcto = false; }   // Valor entre otro rango
+                        if (tcompare_end > init && tcompare_end <= end) { correcto = false; }    // Valor entre otro rango
+    
+                        if (counter === this.state.temporizadores.length) { // Se ejecuta el post al acabar el recorrido de timers
+                            if (correcto) { // En este caso no hay conflicto con otros timers
+                                this.currentService.postTemporizador(newTimer).then(() => {
+                                    Swal.fire(
+                                        'Temporizador creado',
+                                        'Se ha creado el nuevo temporizador en la base de datos',
+                                        'success'
+                                    );
+                                    this.loadTimers();
+                                });                                                            
+                            } else { // Existe conflicto con otros timers (Mismo init o valor entre rangos)
+                                Swal.fire(
+                                    'Hora no válida',
+                                    'En la hora proporcionada por el usuario ya existe otro temporizador activo',
+                                    'error'
+                                );
+                            }
+                        }
+                    });
+                }
             }
         });
     }

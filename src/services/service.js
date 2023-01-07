@@ -1,6 +1,12 @@
 import axios from 'axios';
 import Global from '../Global';
 import Swal from 'sweetalert2';
+import io from "socket.io-client";
+
+const socket = io(Global.SocketUrl, {
+    withCredentials: true,
+});
+
 export default class service {
 
     generateToken(user, password) {
@@ -202,6 +208,7 @@ export default class service {
         var url = Global.mainUrl + "api/timers";
         return new Promise(function(resolve) {
             axios.post(url, newTimer).then(response => {
+                socket.emit("syncData");
                 resolve(response);
             }).catch((error) => {
                 // Something happened in setting up the request that triggered an Error
@@ -214,6 +221,7 @@ export default class service {
         var url = Global.mainUrl + "api/timers";
         return new Promise(function(resolve) {
             axios.put(url, newTimer).then(response => {
+                socket.emit("syncData");
                 resolve(response);
             }).catch((error) => {
                 // Something happened in setting up the request that triggered an Error
@@ -226,6 +234,7 @@ export default class service {
         var url = Global.mainUrl + "api/timers/" + idTimer;
         return new Promise(function(resolve) {
             axios.delete(url).then(response => {
+                socket.emit("syncData");
                 resolve(response);
             }).catch((error) => {
                 // Something happened in setting up the request that triggered an Error

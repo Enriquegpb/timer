@@ -124,22 +124,33 @@ export class Salas extends Component {
                             var currentID = this.state.salas[index].idSala;
                             this.currentService.getTES().then((result_tes) => {
                                 var counter = 0;
-                                result_tes.forEach(registro => {
-                                    counter ++;
-                                    if (registro.idSala === currentID) {
-                                        this.currentService.deleteTES(registro.id);
-                                    }
-                                    if (counter === result_tes.length) {
-                                        this.currentService.deleteSala(currentID).then(() => {
-                                            Swal.fire(
-                                                'Sala eliminada',
-                                                'Se ha eliminado la sala de la base de datos',
-                                                'success'
-                                            );
-                                            this.loadRooms();
-                                        });
-                                    }
-                                });
+                                if (result_tes.length === 0) {
+                                    this.currentService.deleteSala(currentID).then(() => {
+                                        Swal.fire(
+                                            'Sala eliminada',
+                                            'Se ha eliminado la sala de la base de datos',
+                                            'success'
+                                        );
+                                        this.loadRooms();
+                                    });
+                                } else {
+                                    result_tes.forEach(registro => {
+                                        counter ++;
+                                        if (registro.idSala === currentID) {
+                                            this.currentService.deleteTES(registro.id);
+                                        }
+                                        if (counter === result_tes.length) {
+                                            this.currentService.deleteSala(currentID).then(() => {
+                                                Swal.fire(
+                                                    'Sala eliminada',
+                                                    'Se ha eliminado la sala de la base de datos',
+                                                    'success'
+                                                );
+                                                this.loadRooms();
+                                            });
+                                        }
+                                    });
+                                }
                             });
                         }
                     });

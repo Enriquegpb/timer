@@ -7,7 +7,6 @@ import { NavLink } from 'react-router-dom';
 import service from '../services/service';
 
 export class Login extends Component {
-
     currentService = new service();
 
     userbox = React.createRef();
@@ -70,6 +69,9 @@ export class Login extends Component {
                             </NavLink>
                             <NavLink to="/empresas" className='button_superuser'>
                                 Empresas
+                            </NavLink>
+                            <NavLink to="/temporizadores" className='button_superuser'>
+                                Temporizadores
                             </NavLink>
                         </div>
                     )

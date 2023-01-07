@@ -155,13 +155,34 @@ export class Temporizadores extends Component {
                     });
                 }
                 if (result.isDenied) { // Eliminar temporizador
-                    this.currentService.deleteTemporizador(this.state.temporizadores[index].idTemporizador).then((result_put_timer) => {
-                        Swal.fire(
-                            'Temporizador eliminado',
-                            'Se ha eliminado el temporizador de la Base de datos\n(code: x' + result_put_timer.status + ")",
-                            'success'
-                        );
-                        this.loadTimers();
+                    Swal.fire({
+                        title: '¿Estás segur@?',
+                        text: "Al eliminar este temporizador también se eliminarán los registros de empresas asignadas al mismo",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#2C4D9E',
+                        cancelButtonColor: '#FF0000',
+                        confirmButtonText: 'Sí, estoy segur@',
+                        cancelButtonText: 'No, cancelar'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                            var currentID = this.state.temporizadores[index].idTemporizador;
+                            this.currentService.getTES().then((result_tes) => {
+                                result_tes.forEach(registro => {
+                                    if (registro.idTimer === currentID) {
+                                        this.currentService.deleteTES(registro.id);
+                                    }
+                                });
+                            });
+                            this.currentService.deleteTemporizador(currentID).then(() => {
+                                Swal.fire(
+                                    'Temporizador eliminado',
+                                    'Se ha eliminado el temporizador de la Base de datos',
+                                    'success'
+                                );
+                                this.loadTimers();
+                            });
+                        }
                     });
                 }
             });

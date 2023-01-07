@@ -92,10 +92,10 @@ export class Temporizadores extends Component {
                     idCategoria : result.value[1],
                     pausa : false
                 }
-                this.currentService.postTemporizador(newTimer).then((result_post_timer) => {
+                this.currentService.postTemporizador(newTimer).then(() => {
                     Swal.fire(
                         'Temporizador creado',
-                        'Se ha creado el nuevo temporizador en la Base de datos\n(code: x' + result_post_timer.status + ")",
+                        'Se ha creado el nuevo temporizador en la base de datos',
                         'success'
                     );
                     this.loadTimers();
@@ -145,10 +145,10 @@ export class Temporizadores extends Component {
                         idCategoria : result.value[1],
                         pausa : false
                     }
-                    this.currentService.putTemporizador(newTimer).then((result_put_timer) => {
+                    this.currentService.putTemporizador(newTimer).then(() => {
                         Swal.fire(
                             'Temporizador modificado',
-                            'Se ha modificado el temporizador de la Base de datos\n(code: x' + result_put_timer.status + ")",
+                            'Se ha modificado el temporizador de la base de datos',
                             'success'
                         );
                         this.loadTimers();
@@ -177,7 +177,7 @@ export class Temporizadores extends Component {
                             this.currentService.deleteTemporizador(currentID).then(() => {
                                 Swal.fire(
                                     'Temporizador eliminado',
-                                    'Se ha eliminado el temporizador de la Base de datos',
+                                    'Se ha eliminado el temporizador de la base de datos',
                                     'success'
                                 );
                                 this.loadTimers();

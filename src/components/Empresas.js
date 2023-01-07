@@ -52,10 +52,10 @@ export class Empresas extends Component {
             }
         }).then((result) => {
             if (result.isConfirmed) {
-                this.currentService.postEmpresa(result.value).then((result_2) => {
+                this.currentService.postEmpresa(result.value).then(() => {
                     Swal.fire(
                         'Empresa creada',
-                        'Se ha creado la nueva empresa en la Base de datos\n(code: x' + result_2.status + ")",
+                        'Se ha creado la nueva empresa en la base de datos',
                         'success'
                     );
                     this.loadCompanies();
@@ -98,10 +98,10 @@ export class Empresas extends Component {
             }).then((result) => {
                 if (result.isConfirmed) { // Modificar empresa
                     if (currentName.toUpperCase() !== result.value.toUpperCase()) {
-                        this.currentService.putEmpresa(this.state.empresas[index].idEmpresa, result.value).then((result_3) => {
+                        this.currentService.putEmpresa(this.state.empresas[index].idEmpresa, result.value).then(() => {
                             Swal.fire(
                                 'Empresa modificada',
-                                'Se ha modificado la empresa en la Base de datos\n(code: x' + result_3.status + ")",
+                                'Se ha modificado la empresa en la base de datos',
                                 'success'
                             );
                             this.loadCompanies();
@@ -109,13 +109,38 @@ export class Empresas extends Component {
                     }
                 }
                 if (result.isDenied) { // Eliminar empresa
-                    this.currentService.deleteEmpresa(this.state.empresas[index].idEmpresa).then((result_4) => {
-                        Swal.fire(
-                            'Empresa eliminada',
-                            'Se ha eliminado la empresa de la Base de datos\n(code: x' + result_4.status + ")",
-                            'success'
-                        );
-                        this.loadCompanies();
+                    Swal.fire({
+                        title: '¿Estás segur@?',
+                        text: "La empresa y sus correspondientes registros de asignaciones, se eliminarán para siempre",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#2C4D9E',
+                        cancelButtonColor: '#FF0000',
+                        confirmButtonText: 'Sí, estoy segur@',
+                        cancelButtonText: 'No, cancelar'
+                      }).then((result) => {
+                        if (result.isConfirmed) {
+                            var currentID = this.state.empresas[index].idEmpresa;
+                            this.currentService.getTES().then((result_tes) => {
+                                var counter = 0;
+                                result_tes.forEach(registro => {
+                                    counter ++;
+                                    if (registro.idEmpresa === currentID) {
+                                        this.currentService.deleteTES(registro.id);
+                                    }
+                                    if (counter === result_tes.length) {
+                                        this.currentService.deleteEmpresa(this.state.empresas[index].idEmpresa).then(() => {
+                                            Swal.fire(
+                                                'Empresa eliminada',
+                                                'Se ha eliminado la empresa de la base de datos',
+                                                'success'
+                                            );
+                                            this.loadCompanies();
+                                        });
+                                    }
+                                });
+                            });
+                        }
                     });
                 }
             });   

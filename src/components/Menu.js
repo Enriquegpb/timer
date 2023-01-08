@@ -20,8 +20,8 @@ export class Menu extends Component {
     render() {
         return (
             <div style={{"width":"100%"}}>
-                <div className='background_black' id='divbg_black'></div> {/* Div para oscurecer y bloquear el fondo */}
-                <MenuPopUp showHiddenMenu={this.showHiddenMenu} divbg_black={this.divbg_black}/> {/* Menu lateral emergente */}
+                <div className='background_black' id='divbg_black' onClick={this.showHiddenMenu}></div> {/* Div para oscurecer y bloquear el fondo */}
+                <MenuPopUp showHiddenMenu={this.showHiddenMenu}/> {/* Menu lateral emergente */}
                 <div className='menubar'> {/* NavBar general */}
                     <button className='menucircle' onClick={this.showHiddenMenu}>
                         <img src={menuicon} alt="Icono de tres líneas para el menú"/>

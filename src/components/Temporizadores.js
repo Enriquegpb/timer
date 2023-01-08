@@ -381,21 +381,25 @@ export class Temporizadores extends Component {
                 <h1 className='timer_title noselect'>TEMPORIZADORES</h1>
                 <div className='content_box'>
                     {
-                        this.state.temporizadores.map((tempo, index) => {
-                            return (
-                                <div className='box_temporizador' key={index} onClick={() => this.modifyTimer(index)}>
-                                    <div className='box_temporizador_target_time_init noselect'>
-                                        <p className='target_text'>{this.getInicio(tempo.inicio)}</p>
+                        this.state.temporizadores.length === 0 ? (
+                            <p>No existen temporizadores en este momento</p>
+                        ) : (
+                            this.state.temporizadores.map((tempo, index) => {
+                                return (
+                                    <div className='box_temporizador' key={index} onClick={() => this.modifyTimer(index)}>
+                                        <div className='box_temporizador_target_time_init noselect'>
+                                            <p className='target_text'>{this.getInicio(tempo.inicio)}</p>
+                                        </div>
+                                        <div className='box_temporizador_target noselect'>
+                                            <p className='target_text'>{this.getNameCategory(tempo.idCategoria)}</p>
+                                        </div>
+                                        <div className='box_temporizador_target_time_end noselect'>
+                                            <p className='target_text'>{this.getFinal(tempo.idCategoria, tempo.inicio)}</p>
+                                        </div>
                                     </div>
-                                    <div className='box_temporizador_target noselect'>
-                                        <p className='target_text'>{this.getNameCategory(tempo.idCategoria)}</p>
-                                    </div>
-                                    <div className='box_temporizador_target_time_end noselect'>
-                                        <p className='target_text'>{this.getFinal(tempo.idCategoria, tempo.inicio)}</p>
-                                    </div>
-                                </div>
-                            )
-                        })
+                                )
+                            })
+                        )
                     }
                     {
                         this.state.token && (

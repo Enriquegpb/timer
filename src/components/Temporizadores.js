@@ -57,15 +57,23 @@ export class Temporizadores extends Component {
         return auxiliar;
     }
 
-    generateTimer = () => {
+    getDate = () => { // Obtenemos la fecha actual en formato YYYY-mm-dd
+        return new Date().toISOString().split('T')[0];
+    }
+    
+    generateTimer = () => { 
         new Swal({
             title: 'Nuevo temporizador',
             html:
-                '<label for="swal-input1">Hora de inicio</label></br>' +
-                '<input type="time" id="swal-input1" class="swal2-input" style="margin-top:5px;"/></br>' +
+                '<label for="swal-input1">Fecha y hora de inicio</label></br>' +
+                '<input type="date" id="swal-input3" class="swal2-input" value="' + this.getDate() + '" min="' + this.getDate() + 
+                '" style="margin:5px 15px 0 0;">' +
+                '<input type="time" id="swal-input1" class="swal2-input" style="margin:0;"/>' +
+
                 '<p id="error_1" style="display:none; color:red;">Por favor, inserte una hora válida</p></br>' +
+
                 '<label for="swal-input2">Categoría</label></br>' +
-                '<select  id="swal-input2" class="swal2-input" style="margin-top:5px; width:70%;">' + 
+                '<select  id="swal-input2" class="swal2-input" style="margin-top:5px; width:80%;">' + 
                 this.getOptionsCategories(-1) + 
                 '</select>',
             focusConfirm: false,
@@ -80,7 +88,8 @@ export class Temporizadores extends Component {
                 } else {
                     return [
                         document.getElementById('swal-input1').value,
-                        document.getElementById('swal-input2').value
+                        document.getElementById('swal-input2').value,
+                        document.getElementById('swal-input3').value
                     ]
                 }
             }
@@ -88,7 +97,7 @@ export class Temporizadores extends Component {
             if (result.isConfirmed) {
                 var newTimer = {
                     idTemporizador : 0,
-                    inicio : "2023-01-07T" + result.value[0] +":00",
+                    inicio : result.value[2] + "T" + result.value[0] +":00",
                     idCategoria : result.value[1],
                     pausa : false
                 }
@@ -145,7 +154,10 @@ export class Temporizadores extends Component {
                 title: 'Modificar temporizador',
                 html:
                     '<label for="swal-input1">Hora de inicio</label></br>' +
-                    '<input type="time" id="swal-input1" class="swal2-input" style="margin-top:5px;" value="' + 
+                    '<input type="date" id="swal-input3" class="swal2-input" value="' + this.state.temporizadores[index].inicio.split('T')[0] +
+                     '" min="' + this.getDate() + 
+                    '" style="margin:5px 15px 0 0;">' +
+                    '<input type="time" id="swal-input1" class="swal2-input" style="margin:0;" value="' + 
                     this.getInicio(this.state.temporizadores[index].inicio) + 
                     '"/></br>' +
                     '<p id="error_1" style="display:none; color:red;">Por favor, inserte una hora válida</p></br>' +
@@ -168,7 +180,8 @@ export class Temporizadores extends Component {
                     } else {
                         return [
                             document.getElementById('swal-input1').value,
-                            document.getElementById('swal-input2').value
+                            document.getElementById('swal-input2').value,
+                            document.getElementById('swal-input3').value
                         ]
                     }
                 }
@@ -176,7 +189,7 @@ export class Temporizadores extends Component {
                 if (result.isConfirmed) { // Modificar temporizador
                     var newTimer = {
                         idTemporizador : this.state.temporizadores[index].idTemporizador,
-                        inicio : "2023-01-18T" + result.value[0] +":00",
+                        inicio : result.value[2] + "T" + result.value[0] +":00",
                         idCategoria : result.value[1],
                         pausa : false
                     }
@@ -203,19 +216,34 @@ export class Temporizadores extends Component {
                         if (result.isConfirmed) {
                             var currentID = this.state.temporizadores[index].idTemporizador;
                             this.currentService.getTES().then((result_tes) => {
-                                result_tes.forEach(registro => {
-                                    if (registro.idTimer === currentID) {
-                                        this.currentService.deleteTES(registro.id);
-                                    }
-                                });
-                            });
-                            this.currentService.deleteTemporizador(currentID).then(() => {
-                                Swal.fire(
-                                    'Temporizador eliminado',
-                                    'Se ha eliminado el temporizador de la base de datos',
-                                    'success'
-                                );
-                                this.loadTimers();
+                                if (result_tes.length === 0) { // No existen TES, borramos directamente
+                                    this.currentService.deleteTemporizador(currentID).then(() => {
+                                        Swal.fire(
+                                            'Temporizador eliminado',
+                                            'Se ha eliminado el temporizador de la base de datos',
+                                            'success'
+                                        );
+                                        this.loadTimers();
+                                    });
+                                } else { // Existen TES, realizaremos una revisión
+                                    var counter = 0;
+                                    result_tes.forEach(registro => {
+                                        counter++;
+                                        if (registro.idTimer === currentID) {
+                                            this.currentService.deleteTES(registro.id);
+                                        }
+                                        if (counter === result_tes.length) {
+                                            this.currentService.deleteTemporizador(currentID).then(() => {
+                                                Swal.fire(
+                                                    'Temporizador eliminado',
+                                                    'Se ha eliminado el temporizador de la base de datos',
+                                                    'success'
+                                                );
+                                                this.loadTimers();
+                                            });
+                                        }
+                                    });
+                                }
                             });
                         }
                     });

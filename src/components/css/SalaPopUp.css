@@ -44,20 +44,22 @@
     padding: 10px 0;
     margin: 5px 0;
     color: var(--clr_popup_salas);
+    background-color: var(--s03);
     font-family: Share;
     font-weight: 400;
     font-size: 25px;
     box-shadow: 0 4px 0 1px var(--btn_bottom_shw);
 }
 
-/* .popup-btn-sala:hover {
-    box-shadow: none;
-    transform: translateY(4px);
-} */
-
 .popup-btn-sala:active {
     box-shadow: none;
     transform: translateY(4px);
+}
+
+.mainshadow {
+    -webkit-box-shadow: inset 0px 0px 20px 1px rgba(0,0,0,0.50);
+    -moz-box-shadow: inset 0px 0px 20px 1px rgba(0,0,0,0.50);
+    box-shadow: inset 0px 0px 20px 1px rgba(0,0,0,0.50);
 }
 
 .close-icon:after{

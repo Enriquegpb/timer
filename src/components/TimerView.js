@@ -32,7 +32,7 @@ export class TimerView extends Component {
         next_e2 : "",
         statusSalaPopUp : false, // Almacena la aparición o no del PopUp de selección de sala
         checkCompany : false,
-        next_timers_ordenados : null,
+        next_timers_ordenados : [],
         token : false
     }
 
@@ -45,11 +45,11 @@ export class TimerView extends Component {
             this.changeRoom(result[0].nombreSala, result[0].idSala);
         }); // Cargamos el nombre de la primera sala habilitada
 
-        this.currentService.getTemporizadores().then((result) => {
-            this.setState({
-                next_timers_ordenados : result
-            });
-        });
+        // this.currentService.getTemporizadores().then((result) => {
+        //     this.setState({
+        //         next_timers_ordenados : result
+        //     });
+        // });
         
         socket.on('timerID', (idTimer) => {
             this.setState({
@@ -83,6 +83,12 @@ export class TimerView extends Component {
         this.setState({
             sala_id : id,
             sala_nombre : name
+        }, () => {
+            this.currentService.getTemporizadores().then((result) => {
+                this.setState({
+                    next_timers_ordenados : result
+                });
+            });
         });
     }
 
@@ -132,15 +138,28 @@ export class TimerView extends Component {
 
     getLineName = (identificador, lineaUno) => {
         this.currentService.getTES().then((result) => {
+            var counter = 0, idCompany = null;
             result.forEach(element => {
+                counter++;
                 if (element.idSala === this.state.sala_id && element.idTimer === identificador) {
-                    this.currentService.getEmpresa(element.idEmpresa).then((result_2) => {
+                    idCompany = element.idEmpresa;
+                }
+                if (counter === result.length) { // Una vez terminado el recuento, modificamos
+                    if (idCompany !== null) {
+                        this.currentService.getEmpresa(idCompany).then((result_2) => {
+                            if (lineaUno) {
+                                this.setState({ next_e1 : result_2.nombreEmpresa });
+                            } else {
+                                this.setState({ next_e2 : result_2.nombreEmpresa });
+                            }
+                        });
+                    } else {
                         if (lineaUno) {
-                            this.setState({ next_e1 : result_2.nombreEmpresa });
+                            this.setState({ next_e1 : "" });
                         } else {
-                            this.setState({ next_e2 : result_2.nombreEmpresa });
+                            this.setState({ next_e2 : "" });
                         }
-                    });
+                    }
                 }
             });
         });

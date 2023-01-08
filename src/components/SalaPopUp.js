@@ -37,7 +37,7 @@ export class SalaPopUp extends Component {
                         {
                             this.state.salas.map((sala, index) => {
                                 return (
-                                    <button className='popup-btn-sala mainshadow' 
+                                    <button className='popup-btn-sala popup-btn-sala-shadow' 
                                             key={index}
                                             onClick={ () => this.changeRoom(sala.nombreSala, sala.idSala)}>
                                         {sala.nombreSala}

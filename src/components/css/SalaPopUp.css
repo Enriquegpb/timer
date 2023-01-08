@@ -56,7 +56,7 @@
     transform: translateY(4px);
 }
 
-.mainshadow {
+.popup-btn-sala-shadow {
     -webkit-box-shadow: inset 0px 0px 20px 1px rgba(0,0,0,0.50);
     -moz-box-shadow: inset 0px 0px 20px 1px rgba(0,0,0,0.50);
     box-shadow: inset 0px 0px 20px 1px rgba(0,0,0,0.50);

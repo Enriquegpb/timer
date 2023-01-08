@@ -156,13 +156,6 @@ export class TimerView extends Component {
         });
     }
 
-    syncroData = () => {
-        if (this.state.token) {
-            socket.emit("syncData");
-            console.log("Datos sincronizados");
-        }
-    }
-
     render() {
         return (
             <div>
@@ -187,7 +180,7 @@ export class TimerView extends Component {
                             )
                         }
                 </header>
-                <div className='maincircle mainshadow shadowcircle' onClick={ () => this.syncroData() }>
+                <div className='maincircle mainshadow shadowcircle'>
                     <span className='valuecircle noselect'>
                         <Tiempo/>
                     </span>

@@ -32,17 +32,22 @@ export class TimerView extends Component {
         next_e2 : "",
         statusSalaPopUp : false, // Almacena la aparición o no del PopUp de selección de sala
         checkCompany : false,
-        guti : null
+        next_timers_ordenados : null,
+        token : false
     }
 
     componentDidMount = () => {
+        this.setState({
+            token : (localStorage.getItem("token") !== null)
+        });
+
         this.currentService.getSalas().then((result) => {
             this.changeRoom(result[0].nombreSala, result[0].idSala);
         }); // Cargamos el nombre de la primera sala habilitada
 
         this.currentService.getTemporizadores().then((result) => {
             this.setState({
-                guti : result
+                next_timers_ordenados : result
             });
         });
         
@@ -51,7 +56,7 @@ export class TimerView extends Component {
                 timer_id : idTimer
             }, () => {
                 this.setState({
-                    next_timers : this.ordenarTimers(this.state.guti)
+                    next_timers : this.ordenarTimers(this.state.next_timers_ordenados)
                 }, () => {
                     if (this.state.next_timers.length > 0) {
                         this.getCategoryName(this.state.next_timers[0].idCategoria, true);
@@ -151,6 +156,13 @@ export class TimerView extends Component {
         });
     }
 
+    syncroData = () => {
+        if (this.state.token) {
+            socket.emit("syncData");
+            console.log("Datos sincronizados");
+        }
+    }
+
     render() {
         return (
             <div>
@@ -175,7 +187,7 @@ export class TimerView extends Component {
                             )
                         }
                 </header>
-                <div className='maincircle mainshadow shadowcircle'>
+                <div className='maincircle mainshadow shadowcircle' onClick={ () => this.syncroData() }>
                     <span className='valuecircle noselect'>
                         <Tiempo/>
                     </span>

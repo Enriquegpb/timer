@@ -395,7 +395,7 @@ export class Horario extends Component {
                                                         </td>
                                                     ) : (
                                                         check && (
-                                                            <td className='schedule_col scroll'>
+                                                            <td className='schedule_col scroll' style={{"fontWeight":"bold"}}>
                                                                 {this.getCompany(tempo.idTemporizador)}
                                                             </td>
                                                         )
@@ -403,7 +403,7 @@ export class Horario extends Component {
                                                 }
                                                 {
                                                     !this.state.edit_mode && (
-                                                        <td colSpan={catcolspan} className='schedule_col scroll'>
+                                                        <td colSpan={catcolspan} className='schedule_col scroll' style={{"backgroundColor":"#F0F0F0"}}>
                                                             {this.getCategory(tempo.idCategoria)}
                                                         </td>    
                                                     )

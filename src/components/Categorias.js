@@ -267,16 +267,20 @@ export class Categorias extends Component {
                 <div className='content_box'>
                     {
                         this.state.categorias && (
-                            this.state.categorias.map((categoria, index) => {
-                                return (
-                                    <div className='box_categoria' key={index} onClick={() => this.modifyCategory(index)}>
-                                        <div className='box_categoria_target_time'>{this.transformMinutes(categoria.duracion, true)}</div>
-                                        <div className='box_categoria_target noselect'>
-                                            {categoria.categoria}
+                            this.state.categorias.length === 0 ? (
+                                <p>No existen categorías en este momento</p>
+                            ) : (
+                                this.state.categorias.map((categoria, index) => {
+                                    return (
+                                        <div className='box_categoria' key={index} onClick={() => this.modifyCategory(index)}>
+                                            <div className='box_categoria_target_time'>{this.transformMinutes(categoria.duracion, true)}</div>
+                                            <div className='box_categoria_target noselect'>
+                                                {categoria.categoria}
+                                            </div>
                                         </div>
-                                    </div>
-                                )
-                            })
+                                    )
+                                })
+                            )
                         )
                     }
                     {

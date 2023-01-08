@@ -154,15 +154,19 @@ export class Empresas extends Component {
                 <div className='content_box'>
                     {
                         this.state.empresas && (
-                            this.state.empresas.map((empresa, index) => {
-                                return (
-                                    <div className='box_empresa' key={index} onClick={() => this.modifyCompany(index)}>
-                                        <p className='box_empresa_target noselect'>
-                                            {empresa.nombreEmpresa}
-                                        </p>
-                                    </div>
-                                )
-                            })
+                            this.state.empresas.length === 0 ? (
+                                <p>No existen empresas en este momento</p>
+                            ) : (
+                                this.state.empresas.map((empresa, index) => {
+                                    return (
+                                        <div className='box_empresa' key={index} onClick={() => this.modifyCompany(index)}>
+                                            <p className='box_empresa_target noselect'>
+                                                {empresa.nombreEmpresa}
+                                            </p>
+                                        </div>
+                                    )
+                                })
+                            )
                         )
                     }
                     {

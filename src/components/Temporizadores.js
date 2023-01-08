@@ -67,7 +67,7 @@ export class Temporizadores extends Component {
             html:
                 '<label for="swal-input1">Fecha y hora de inicio</label></br>' +
                 '<input type="date" id="swal-input3" class="swal2-input" value="' + this.getDate() + '" min="' + this.getDate() + 
-                '" style="margin:5px 15px 0 0;">' +
+                '" style="margin:5px 0 0 0;">' +
                 '<input type="time" id="swal-input1" class="swal2-input" style="margin:0;"/>' +
 
                 '<p id="error_1" style="display:none; color:red;">Por favor, inserte una hora válida</p></br>' +
@@ -102,8 +102,10 @@ export class Temporizadores extends Component {
                     pausa : false
                 }
                 var counter = 0, correcto = true;
-                var tcompare_init = this.transformDuration(this.getInicio(newTimer.inicio));
-                var tcompare_end = this.transformDuration(this.getFinal(Number.parseInt(newTimer.idCategoria), newTimer.inicio));
+                var compare_init = this.getInicio(newTimer.inicio);
+                var compare_end = this.getFinal(Number.parseInt(newTimer.idCategoria), newTimer.inicio);
+                var tcompare_init = this.transformDuration(compare_init);
+                var tcompare_end = this.transformDuration(compare_end);
                 if (this.state.temporizadores.length === 0) {
                     this.currentService.postTemporizador(newTimer).then(() => {
                         Swal.fire(
@@ -135,11 +137,27 @@ export class Temporizadores extends Component {
                                     this.loadTimers();
                                 });                                                            
                             } else { // Existe conflicto con otros timers (Mismo init o valor entre rangos)
-                                Swal.fire(
-                                    'Hora no válida',
-                                    'En la hora proporcionada por el usuario ya existe otro temporizador activo',
-                                    'error'
-                                );
+                                Swal.fire({
+                                    title: 'Hora no válida',
+                                    text: 'En el rango proporcionado por el usuario (' + compare_init + ' - ' + compare_end + ') ya existe otro temporizador activo.',
+                                    icon: 'error',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#2C4D9E',
+                                    confirmButtonText: 'Entendido',
+                                    cancelButtonText: 'Más información'
+                                }).then((result_message) => {
+                                    if (result_message.isDismissed) {
+                                        Swal.fire({
+                                            title : 'Control contra solapamiento de tiempos',
+                                            html : '<p style="margin:0;">Se utiliza está medida para evitar que un temporizador se solape con otro.</p><br/>' +
+                                            '<p style="margin:0;"><b>Ejemplo:</b> Es posible que un temporizador se inicie a las <b>12:30</b> si el anterior ' +
+                                            'acaba a la misma hora, pero no es posible que se inicie a las <b>12:29</b> ya que eso ' +
+                                            'provocaría un solapamiento de tiempos.</p><br/><p style="margin:0;"> Esta medida se revisa cada vez que se modifica ' +
+                                            'la hora de inicio o la categoría (por ende la duración) de dicho temporizador. </p>',
+                                            icon : 'info'
+                                        });
+                                    }
+                                });
                             }
                         }
                     });
@@ -156,7 +174,7 @@ export class Temporizadores extends Component {
                     '<label for="swal-input1">Hora de inicio</label></br>' +
                     '<input type="date" id="swal-input3" class="swal2-input" value="' + this.state.temporizadores[index].inicio.split('T')[0] +
                      '" min="' + this.getDate() + 
-                    '" style="margin:5px 15px 0 0;">' +
+                    '" style="margin:5px 0 0 0;">' +
                     '<input type="time" id="swal-input1" class="swal2-input" style="margin:0;" value="' + 
                     this.getInicio(this.state.temporizadores[index].inicio) + 
                     '"/></br>' +
@@ -193,14 +211,67 @@ export class Temporizadores extends Component {
                         idCategoria : result.value[1],
                         pausa : false
                     }
-                    this.currentService.putTemporizador(newTimer).then(() => {
-                        Swal.fire(
-                            'Temporizador modificado',
-                            'Se ha modificado el temporizador de la base de datos',
-                            'success'
-                        );
-                        this.loadTimers();
-                    });
+                    var counter = 0, correcto = true;
+                    var compare_init = this.getInicio(newTimer.inicio);
+                    var compare_end = this.getFinal(Number.parseInt(newTimer.idCategoria), newTimer.inicio);
+                    var tcompare_init = this.transformDuration(compare_init);
+                    var tcompare_end = this.transformDuration(compare_end);
+                    if (this.state.temporizadores.length === 0) {
+                        this.currentService.putTemporizador(newTimer).then(() => {
+                            Swal.fire(
+                                'Temporizador modificado',
+                                'Se ha modificado el temporizador de la base de datos',
+                                'success'
+                            );
+                            this.loadTimers();
+                        }); 
+                    } else {
+                        this.state.temporizadores.forEach((tempo) => {
+                            counter ++; // Esta variable avisará a la función asyn. para que se ejecute cuando termine el forEach
+                            var init = this.transformDuration(this.getInicio(tempo.inicio));                    // Inicio en int
+                            var end = this.transformDuration(this.getFinal(tempo.idCategoria, tempo.inicio));   // Final en int
+        
+                            // CASOS NO COMPATIBLES ================================================================
+                            if (tcompare_init === init) { correcto = false; }                        // Mismo inicio
+                            if (tcompare_init > init && tcompare_init < end) { correcto = false; }   // Valor entre otro rango
+                            if (tcompare_end > init && tcompare_end <= end) { correcto = false; }    // Valor entre otro rango
+        
+                            if (counter === this.state.temporizadores.length) { // Se ejecuta el post al acabar el recorrido de timers
+                                if (correcto) { // En este caso no hay conflicto con otros timers
+                                    this.currentService.putTemporizador(newTimer).then(() => {
+                                        Swal.fire(
+                                            'Temporizador modificado',
+                                            'Se ha modificado el temporizador de la base de datos',
+                                            'success'
+                                        );
+                                        this.loadTimers();
+                                    });                                                      
+                                } else { // Existe conflicto con otros timers (Mismo init o valor entre rangos)
+                                    Swal.fire({
+                                        title: 'Hora no válida',
+                                        text: 'En el rango proporcionado por el usuario (' + compare_init + ' - ' + compare_end + ') ya existe otro temporizador activo.',
+                                        icon: 'error',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#2C4D9E',
+                                        confirmButtonText: 'Entendido',
+                                        cancelButtonText: 'Más información'
+                                    }).then((result_message) => {
+                                        if (result_message.isDismissed) {
+                                            Swal.fire({
+                                                title : 'Control contra solapamiento de tiempos',
+                                                html : '<p style="margin:0;">Se utiliza está medida para evitar que un temporizador se solape con otro.</p><br/>' +
+                                                '<p style="margin:0;"><b>Ejemplo:</b> Es posible que un temporizador se inicie a las <b>12:30</b> si el anterior ' +
+                                                'acaba a la misma hora, pero no es posible que se inicie a las <b>12:29</b> ya que eso ' +
+                                                'provocaría un solapamiento de tiempos.</p><br/><p style="margin:0;"> Esta medida se revisa cada vez que se modifica ' +
+                                                'la hora de inicio o la categoría (por ende la duración) de dicho temporizador. </p>',
+                                                icon : 'info'
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
                 }
                 if (result.isDenied) { // Eliminar temporizador
                     Swal.fire({
@@ -310,21 +381,25 @@ export class Temporizadores extends Component {
                 <h1 className='timer_title noselect'>TEMPORIZADORES</h1>
                 <div className='content_box'>
                     {
-                        this.state.temporizadores.map((tempo, index) => {
-                            return (
-                                <div className='box_temporizador' key={index} onClick={() => this.modifyTimer(index)}>
-                                    <div className='box_temporizador_target_time_init noselect'>
-                                        <p className='target_text'>{this.getInicio(tempo.inicio)}</p>
+                        this.state.temporizadores.length === 0 ? (
+                            <p>No existen temporizadores en este momento</p>
+                        ) : (
+                            this.state.temporizadores.map((tempo, index) => {
+                                return (
+                                    <div className='box_temporizador' key={index} onClick={() => this.modifyTimer(index)}>
+                                        <div className='box_temporizador_target_time_init noselect'>
+                                            <p className='target_text'>{this.getInicio(tempo.inicio)}</p>
+                                        </div>
+                                        <div className='box_temporizador_target noselect'>
+                                            <p className='target_text'>{this.getNameCategory(tempo.idCategoria)}</p>
+                                        </div>
+                                        <div className='box_temporizador_target_time_end noselect'>
+                                            <p className='target_text'>{this.getFinal(tempo.idCategoria, tempo.inicio)}</p>
+                                        </div>
                                     </div>
-                                    <div className='box_temporizador_target noselect'>
-                                        <p className='target_text'>{this.getNameCategory(tempo.idCategoria)}</p>
-                                    </div>
-                                    <div className='box_temporizador_target_time_end noselect'>
-                                        <p className='target_text'>{this.getFinal(tempo.idCategoria, tempo.inicio)}</p>
-                                    </div>
-                                </div>
-                            )
-                        })
+                                )
+                            })
+                        )
                     }
                     {
                         this.state.token && (

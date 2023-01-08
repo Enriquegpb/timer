@@ -165,15 +165,21 @@ export class Salas extends Component {
                 <h1 className='timer_title'>SALAS</h1>
                 <div className='content_box'>
                     {
-                        this.state.salas.map((sala, index) => {
-                            return (
-                                <div className='box_sala scroll' key={index} onClick={() => this.modifyRoom(index)}>
-                                    <p className='box_sala_target noselect'>
-                                        {sala.nombreSala}
-                                    </p>
-                                </div>
+                        this.state.salas && (
+                            this.state.salas.length === 0 ? (
+                                <p>No existen salas en este momento</p>
+                            ) : (
+                                this.state.salas.map((sala, index) => {
+                                    return (
+                                        <div className='box_sala scroll' key={index} onClick={() => this.modifyRoom(index)}>
+                                            <p className='box_sala_target noselect'>
+                                                {sala.nombreSala}
+                                            </p>
+                                        </div>
+                                    )
+                                })
                             )
-                        })
+                        )
                     }
                     {
                         this.state.token && (

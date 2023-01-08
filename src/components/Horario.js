@@ -224,7 +224,7 @@ export class Horario extends Component {
                         this.currentService.postTES(newRegister).then((result_tes_2) => {
                             Swal.fire(
                                 'Empresa asignada',
-                                'Se ha asignado una empresa a este momento\n(code: x' + result_tes_2.status + ")",
+                                'Se ha asignado una empresa a este momento',
                                 'success'
                             );
                             this.loadTiemposEmpresasSalas();
@@ -257,7 +257,7 @@ export class Horario extends Component {
                     this.currentService.deleteTES(idTes).then((result_tes) => {
                         Swal.fire(
                             'Empresa desasignada',
-                            'Ya no existe una empresa asignada a este momento\n(code: x' + result_tes.status + ")",
+                            'Ya no existe una empresa asignada a este momento',
                             'success'
                         );
                         this.loadTiemposEmpresasSalas();

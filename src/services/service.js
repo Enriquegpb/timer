@@ -271,6 +271,7 @@ export default class service {
         var url = Global.mainUrl + "api/categoriastimer";
         return new Promise(function(resolve) {
             axios.post(url, newCategory).then(response => {
+                socket.emit("syncData");
                 resolve(response);
             }).catch((error) => {
                 // Something happened in setting up the request that triggered an Error
@@ -283,6 +284,7 @@ export default class service {
         var url = Global.mainUrl + "api/categoriastimer";
         return new Promise(function(resolve) {
             axios.put(url, newCategory).then(response => {
+                socket.emit("syncData");
                 resolve(response);
             }).catch((error) => {
                 // Something happened in setting up the request that triggered an Error
@@ -295,6 +297,7 @@ export default class service {
         var url = Global.mainUrl + "api/categoriastimer/" + idcategoria;
         return new Promise(function(resolve) {
             axios.delete(url).then(response => {
+                socket.emit("syncData");
                 resolve(response);
             }).catch((error) => {
                 // Something happened in setting up the request that triggered an Error

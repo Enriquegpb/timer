@@ -101,11 +101,6 @@ export class Temporizadores extends Component {
                     idCategoria : result.value[1],
                     pausa : false
                 }
-                var counter = 0, correcto = true;
-                var compare_init = this.getInicio(newTimer.inicio);
-                var compare_end = this.getFinal(Number.parseInt(newTimer.idCategoria), newTimer.inicio);
-                var tcompare_init = this.transformDuration(compare_init);
-                var tcompare_end = this.transformDuration(compare_end);
                 if (this.state.temporizadores.length === 0) {
                     this.currentService.postTemporizador(newTimer).then(() => {
                         Swal.fire(
@@ -116,6 +111,11 @@ export class Temporizadores extends Component {
                         this.loadTimers();
                     }); 
                 } else {
+                    var counter = 0, correcto = true;
+                    var compare_init = this.getInicio(newTimer.inicio);
+                    var compare_end = this.getFinal(Number.parseInt(newTimer.idCategoria), newTimer.inicio);
+                    var tcompare_init = this.transformDuration(compare_init);
+                    var tcompare_end = this.transformDuration(compare_end);
                     this.state.temporizadores.forEach((tempo) => {
                         counter ++; // Esta variable avisará a la función asyn. para que se ejecute cuando termine el forEach
                         var init = this.transformDuration(this.getInicio(tempo.inicio));                    // Inicio en int
@@ -211,11 +211,6 @@ export class Temporizadores extends Component {
                         idCategoria : result.value[1],
                         pausa : false
                     }
-                    var counter = 0, correcto = true;
-                    var compare_init = this.getInicio(newTimer.inicio);
-                    var compare_end = this.getFinal(Number.parseInt(newTimer.idCategoria), newTimer.inicio);
-                    var tcompare_init = this.transformDuration(compare_init);
-                    var tcompare_end = this.transformDuration(compare_end);
                     if (this.state.temporizadores.length === 0) {
                         this.currentService.putTemporizador(newTimer).then(() => {
                             Swal.fire(
@@ -226,15 +221,22 @@ export class Temporizadores extends Component {
                             this.loadTimers();
                         }); 
                     } else {
+                        var counter = 0, correcto = true;
+                        var compare_init = this.getInicio(newTimer.inicio);
+                        var compare_end = this.getFinal(Number.parseInt(newTimer.idCategoria), newTimer.inicio);
+                        var tcompare_init = this.transformDuration(compare_init);
+                        var tcompare_end = this.transformDuration(compare_end);
                         this.state.temporizadores.forEach((tempo) => {
                             counter ++; // Esta variable avisará a la función asyn. para que se ejecute cuando termine el forEach
-                            var init = this.transformDuration(this.getInicio(tempo.inicio));                    // Inicio en int
-                            var end = this.transformDuration(this.getFinal(tempo.idCategoria, tempo.inicio));   // Final en int
-        
-                            // CASOS NO COMPATIBLES ================================================================
-                            if (tcompare_init === init) { correcto = false; }                        // Mismo inicio
-                            if (tcompare_init > init && tcompare_init < end) { correcto = false; }   // Valor entre otro rango
-                            if (tcompare_end > init && tcompare_end <= end) { correcto = false; }    // Valor entre otro rango
+                            if (newTimer.idTemporizador !== tempo.idTemporizador) {
+                                var init = this.transformDuration(this.getInicio(tempo.inicio));                    // Inicio en int
+                                var end = this.transformDuration(this.getFinal(tempo.idCategoria, tempo.inicio));   // Final en int
+            
+                                // CASOS NO COMPATIBLES ================================================================
+                                if (tcompare_init === init) { correcto = false; }                        // Mismo inicio
+                                if (tcompare_init > init && tcompare_init < end) { correcto = false; }   // Valor entre otro rango
+                                if (tcompare_end > init && tcompare_end <= end) { correcto = false; }    // Valor entre otro rango
+                            }
         
                             if (counter === this.state.temporizadores.length) { // Se ejecuta el post al acabar el recorrido de timers
                                 if (correcto) { // En este caso no hay conflicto con otros timers

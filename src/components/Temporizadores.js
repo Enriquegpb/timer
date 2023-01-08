@@ -139,7 +139,7 @@ export class Temporizadores extends Component {
                             } else { // Existe conflicto con otros timers (Mismo init o valor entre rangos)
                                 Swal.fire({
                                     title: 'Hora no válida',
-                                    text: 'En el rango proporcionado por el usuario (' + compare_init + ' - ' + compare_end + ')' + ' ya existe otro temporizador activo.',
+                                    text: 'En el rango proporcionado por el usuario (' + compare_init + ' - ' + compare_end + ') ya existe otro temporizador activo.',
                                     icon: 'error',
                                     showCancelButton: true,
                                     confirmButtonColor: '#2C4D9E',
@@ -249,7 +249,7 @@ export class Temporizadores extends Component {
                                 } else { // Existe conflicto con otros timers (Mismo init o valor entre rangos)
                                     Swal.fire({
                                         title: 'Hora no válida',
-                                        text: 'En el rango proporcionado por el usuario (' + compare_init + ' - ' + compare_end + ')' + ' ya existe otro temporizador activo.',
+                                        text: 'En el rango proporcionado por el usuario (' + compare_init + ' - ' + compare_end + ') ya existe otro temporizador activo.',
                                         icon: 'error',
                                         showCancelButton: true,
                                         confirmButtonColor: '#2C4D9E',

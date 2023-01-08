@@ -98,6 +98,32 @@ export class Categorias extends Component {
         });
     }
 
+    getInicio = (string_init) => {
+        var time = new Date(string_init);
+        var time_string = time.toTimeString().split(' ')[0];
+        return time_string.substring(0, time_string.length - 3);
+    }
+
+    getFinal = (idcat, inicio) => {
+        var res = "";
+        if (this.state.categorias) {
+            var inicio_min = this.transformDuration(this.getInicio(inicio));
+            this.state.categorias.forEach(element => {
+                if (element.idCategoria === idcat) {
+                    inicio_min += element.duracion;
+                    res = this.transformMinutes(inicio_min);
+                }
+            });
+        }
+        return res;
+    }
+
+    getFinalSegunDuracion = (duracion, inicio) => {
+        var inicio_min = this.transformDuration(this.getInicio(inicio));
+        inicio_min += duracion;
+        return this.transformMinutes(inicio_min);
+    }
+
     transformDuration = (duration) => { // Pasar de 01:15 a 75 (min - integer)
         var time = duration.split(":");
         var hours = Number.parseInt(time[0]);
@@ -120,6 +146,32 @@ export class Categorias extends Component {
         }
     }
 
+    ejecutarPutCategoria = (newCategory) => {
+        this.currentService.putCategoria(newCategory).then(() => {
+            Swal.fire(
+                'Categoría modificada',
+                'Se ha modificado la categoría en la base de datos',
+                'success'
+            );
+            this.loadcategories();
+        });
+    }
+
+    validarTimer = (temporizador, temporizadores, duracion) => {
+        var correcto = true;
+        var compare_end = this.getFinalSegunDuracion(duracion, temporizador.inicio);
+        var tcompare_end = this.transformDuration(compare_end);
+        temporizadores.forEach((tempo) => {
+            if (tempo.idTemporizador !== temporizador.idTemporizador) {
+                var init = this.transformDuration(this.getInicio(tempo.inicio));                    // Inicio en int
+                var end = this.transformDuration(this.getFinal(tempo.idCategoria, tempo.inicio));   // Final en int
+                if (tcompare_end > init && tcompare_end <= end) { correcto = false; }    // Valor entre otro rango
+                if (tcompare_end > end) { correcto = false; }    // Valor entre otro rango
+            }
+        });
+        return correcto;
+    }
+
     modifyCategory = (index) => {
         if (this.state.token) {
             var currentName = this.state.categorias[index].categoria;
@@ -135,7 +187,7 @@ export class Categorias extends Component {
                     '<p id="error_2" style="display:none; color:red;">Ya existe una categoría con el mismo nombre</p>' +
                     '</br><label for="swal-input2">Duración</label></br>' +
                     '<input type="time" id="swal-input2" class="swal2-input" value="' + 
-                    this.transformMinutes(this.state.categorias[index].duracion, false) + 
+                    this.transformMinutes(currentDuration, false) + 
                     '" style="margin-top:5px;"/></br>' +
                     '<p id="error_3" style="display:none; color:red; margin-bottom:0;">Tiempo mínimo: 1 minuto</p>',
                 focusConfirm: false,
@@ -188,14 +240,56 @@ export class Categorias extends Component {
                             categoria : result.value[0],
                             duracion : this.transformDuration(result.value[1])
                         }
-                        this.currentService.putCategoria(newCategory).then(() => {
-                            Swal.fire(
-                                'Categoría modificada',
-                                'Se ha modificado la categoría en la base de datos',
-                                'success'
-                            );
-                            this.loadcategories();
-                        });
+                        if (this.transformDuration(result.value[1]) > currentDuration) { // Duración modificada a la alza, entramos en revisión
+                            this.currentService.getTemporizadores().then((result_tempos) => { // Obtenemos los temporizadores
+                                if (result_tempos.length === 0) { // No hay temporizadores que revisar, ejecutamos el put
+                                    this.ejecutarPutCategoria(newCategory);
+                                } else {
+                                    var tempos_afectados = [];
+
+                                    result_tempos.forEach(tempo => { // Recorremos los temporizadores
+                                        if (tempo.idCategoria === newCategory.idCategoria) { // Timer con la categoría asignada
+                                            tempos_afectados.push(tempo);
+                                        }
+                                    });
+
+                                    var correcto = true;
+                                    tempos_afectados.forEach(tempo_afectado => {
+                                        if (!this.validarTimer(tempo_afectado, result_tempos, newCategory.duracion)) {
+                                            correcto = false;
+                                        }
+                                    });
+
+                                    if (correcto) { // Todos los timers alterados han sido valorados satisfactoriamente
+                                        this.ejecutarPutCategoria(newCategory);
+                                    } else { // Se producen solapamientos. Se bloquea este cambio
+                                        Swal.fire({
+                                            title: 'Duración no válida',
+                                            text: 'Acción denegada. La nueva ampliación de la duración, produce solapamientos en algunos temporizadores existentes.',
+                                            icon: 'error',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#2C4D9E',
+                                            confirmButtonText: 'Entendido',
+                                            cancelButtonText: 'Más información'
+                                        }).then((result_message) => {
+                                            if (result_message.isDismissed) {
+                                                Swal.fire({
+                                                    title : 'Control contra solapamiento de tiempos',
+                                                    html : '<p style="margin:0;">Se utiliza está medida para evitar que un temporizador se solape con otro.</p><br/>' +
+                                                    '<p style="margin:0;"><b>Ejemplo:</b> Es posible que un temporizador se inicie a las <b>12:30</b> si el anterior ' +
+                                                    'acaba a la misma hora, pero no es posible que se inicie a las <b>12:29</b> ya que eso ' +
+                                                    'provocaría un solapamiento de tiempos.</p><br/><p style="margin:0;"> Esta medida se revisa cada vez que se modifica ' +
+                                                    'la hora de inicio o la categoría (por ende la duración) de dicho temporizador. </p>',
+                                                    icon : 'info'
+                                                });
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        } else { // No se ha modificado la duración. Directamente se ejecuta el put
+                            this.ejecutarPutCategoria(newCategory);
+                        }
                     }
                 }
                 if (result.isDenied) { // Eliminar categoría

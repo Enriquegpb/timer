@@ -157,6 +157,17 @@ export class Categorias extends Component {
         });
     }
 
+    ejecutarDeleteCategoria = (currentIDCategory) => {
+        this.currentService.deleteCategoria(currentIDCategory).then(() => {
+            Swal.fire(
+                'Categoría eliminada',
+                'Se ha eliminado la categoría en la base de datos',
+                'success'
+            );
+            this.loadcategories();
+        });
+    }
+
     validarTimer = (temporizador, temporizadores, duracion) => {
         var correcto = true;
         var compare_end = this.getFinalSegunDuracion(duracion, temporizador.inicio);
@@ -308,39 +319,36 @@ export class Categorias extends Component {
                             this.currentService.getTemporizadores().then((result_timers) => {
                                 var counter_timers = 0;
                                 if (result_timers.length === 0) {
-                                    this.currentService.deleteCategoria(currentIDCategory).then(() => {
-                                        Swal.fire(
-                                            'Categoría eliminada',
-                                            'Se ha eliminado la categoría en la base de datos',
-                                            'success'
-                                        );
-                                        this.loadcategories();
-                                    });
+                                    this.ejecutarDeleteCategoria(currentIDCategory);
                                 } else {
                                     result_timers.forEach(timer => {
                                         counter_timers ++;
                                         if (timer.idCategoria === currentIDCategory) { // Timer con la categoría asignada encontrado
                                             this.currentService.getTES().then((result_tes) => { // Obtengo los registros de los TES asociados
-                                                var counter_tes = 0;
-                                                result_tes.forEach(registro => { // Recorro los registros de los TES asociados
-                                                    counter_tes ++;
-                                                    if (registro.idTimer === timer.idTemporizador) {
-                                                        this.currentService.deleteTES(registro.id);
-                                                    }
-                                                    if (counter_tes === result_tes.length) {
-                                                        this.currentService.deleteTemporizador(timer.idTemporizador);
-                                                    }
-                                                });
-                                            });
-                                        }
-                                        if (counter_timers === result_timers.length) {
-                                            this.currentService.deleteCategoria(currentIDCategory).then(() => {
-                                                Swal.fire(
-                                                    'Categoría eliminada',
-                                                    'Se ha eliminado la categoría en la base de datos',
-                                                    'success'
-                                                );
-                                                this.loadcategories();
+                                                if (result_tes.length === 0) {
+                                                    this.currentService.deleteTemporizador(timer.idTemporizador).then(() => {
+                                                        if (counter_timers === result_timers.length) {
+                                                            this.ejecutarDeleteCategoria(currentIDCategory);
+                                                        }
+                                                    });
+                                                } else {
+                                                    var counter_tes = 0;
+                                                    result_tes.forEach(registro => { // Recorro los registros de los TES asociados
+                                                        counter_tes ++;
+                                                        if (registro.idTimer === timer.idTemporizador) {
+                                                            this.currentService.deleteTES(registro.id).then(() => {
+                                                                if (counter_tes === result_tes.length) {
+                                                                    this.currentService.deleteTemporizador(timer.idTemporizador).then(() => {
+                                                                        if (counter_timers === result_timers.length) {
+                                                                            this.ejecutarDeleteCategoria(currentIDCategory);
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+                                                        }
+                                                        
+                                                    });
+                                                }
                                             });
                                         }
                                     });
